@@ -33,10 +33,10 @@ function clientSideGeminiTriage(text, channel) {
   } else if (["garbage", "kachra", "waste", "smell", "dump", "ਕੂੜਾ", "ਗੰਦਗੀ", "कचरा", "सफाई"].some(w => t.includes(w))) {
     category = "Sanitation & Waste Management";
     department = "Medical Officer of Health (Sanitation Wing)";
-    urgency = 6;
+    urgency = 4;
   }
 
-  // 3. Sector Geocoding (exact coordinates aligned with Le Corbusier centroids)
+  // 3. Sector Geocoding (Localized coordinates strictly within sector boundaries)
   let sector = "Sector 17";
   let lat = 30.7398;
   let lng = 76.7827;
@@ -48,7 +48,7 @@ function clientSideGeminiTriage(text, channel) {
   } else if (t.includes("phase 7") || t.includes("mohali") || text.includes("ਮੋਹਾਲੀ") || t.includes("ਫੇਜ਼ 7")) {
     sector = "Phase 7 Mohali"; lat = 30.7055; lng = 76.7125;
   } else if (t.includes("15") || t.includes("patel") || text.includes("੧੫")) {
-    sector = "Sector 15"; lat = 30.7510; lng = 76.7620;
+    sector = "Sector 15"; lat = 30.7510; lng = 76.7710;
   } else if (t.includes("8") || t.includes("madhya") || text.includes("dav")) {
     sector = "Sector 8"; lat = 30.7350; lng = 76.7960;
   } else if (t.includes("20")) {
@@ -131,26 +131,69 @@ function showToast(title, message, type = 'info') {
 }
 
 // ---------------------------------------------------------------------------
+// DYNAMIC MULTI-COLOR SEVERITY ENGINE
+// ---------------------------------------------------------------------------
+function getHotspotSeverity(urgency) {
+  if (urgency >= 9) {
+    return {
+      color: '#dc2626',      // Red (Critical / Life Threatening)
+      fillColor: '#ef4444',
+      label: 'Critical (9–10)',
+      badgeClass: 'bg-red-600'
+    };
+  } else if (urgency >= 7) {
+    return {
+      color: '#7c3aed',      // Purple (Severe Public Risk)
+      fillColor: '#8b5cf6',
+      label: 'Severe (7–8)',
+      badgeClass: 'bg-purple-600'
+    };
+  } else if (urgency >= 5) {
+    return {
+      color: '#0284c7',      // Blue (Moderate Infrastructure Concern)
+      fillColor: '#38bdf8',
+      label: 'Moderate (5–6)',
+      badgeClass: 'bg-sky-500'
+    };
+  } else {
+    return {
+      color: '#059669',      // Green (Routine Maintenance / Sanitation)
+      fillColor: '#10b981',
+      label: 'Routine (1–4)',
+      badgeClass: 'bg-emerald-500'
+    };
+  }
+}
+
+function getMarkerColor(urgency) {
+  if (urgency >= 9) return '#dc2626'; // Red
+  if (urgency >= 7) return '#7c3aed'; // Purple
+  if (urgency >= 5) return '#0284c7'; // Blue
+  return '#059669';                  // Green
+}
+
+// ---------------------------------------------------------------------------
 // MAP & HOTSPOT INTERACTIVITY ENGINE
 // ---------------------------------------------------------------------------
 let map;
 let markersLayer;
 let hotspotsLayer;
-let hotspotCircleMap = []; // Array of { sector, circle, data, baseRadius }
+let hotspotCircleMap = []; // Array of { sector, circle, data, baseRadius, severity }
 let grievanceMarkers = [];  // Array of { sector, marker, data }
 let activeSelectedSector = null;
 let categoryChart, channelChart, languageChart;
 
+// Centroids precisely calibrated to keep circles inside individual sector blocks
 const SECTOR_COORDS = {
-  'sector15': [30.7510, 76.7620],
-  'sector22': [30.7300, 76.7740],
-  'sector35': [30.7290, 76.7540],
-  'phase7mohali': [30.7055, 76.7125],
-  'sector20': [30.7170, 76.7920],
-  'sector8': [30.7350, 76.7960],
-  'sector43': [30.7160, 76.7490],
-  'sector14panchkula': [30.6850, 76.8600],
-  'sector17': [30.7398, 76.7827]
+  'sector15': [30.7510, 76.7710], // Sector 15 Patel Market & School (firmly in Sector 15, away from PU/24/25)
+  'sector22': [30.7300, 76.7740], // Sector 22 Shastri Market
+  'sector35': [30.7290, 76.7540], // Sector 35 Hotel strip & market
+  'phase7mohali': [30.7055, 76.7125], // Phase 7 Mohali commercial market
+  'sector20': [30.7170, 76.7920], // Sector 20 market
+  'sector8': [30.7350, 76.7960],  // Sector 8 Madhya Marg
+  'sector43': [30.7160, 76.7490], // Sector 43 ISBT
+  'sector14panchkula': [30.6850, 76.8600], // Sector 14 Panchkula corridor
+  'sector17': [30.7398, 76.7827]  // Sector 17 Plaza
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -184,23 +227,26 @@ function renderHotspots(hotspots) {
   hotspotCircleMap = [];
 
   hotspots.forEach(h => {
-    const baseRadius = 450 + (h.incident_count * 120);
+    // Tightly localized radius confined strictly inside the affected market/block (115m to 160m max)
+    const baseRadius = Math.min(160, 110 + (Math.min(h.incident_count, 10) * 5));
+    const sev = getHotspotSeverity(h.avg_urgency);
+
     const circle = L.circle([h.center_lat, h.center_lng], {
-      color: '#e11d48',
-      fillColor: '#f43f5e',
-      fillOpacity: 0.28,
+      color: sev.color,
+      fillColor: sev.fillColor,
+      fillOpacity: 0.35,
       weight: 2,
       radius: baseRadius
     }).bindPopup(`
       <div class="text-xs font-sans p-1">
         <div class="flex items-center gap-1.5 mb-1">
-          <span class="px-1.5 py-0.5 rounded bg-rose-600 text-white font-bold text-[10px]">${h.cluster_id}</span>
+          <span class="px-1.5 py-0.5 rounded text-white font-bold text-[10px]" style="background:${sev.color}">${h.cluster_id}</span>
           <span class="font-bold text-slate-800">${h.sector}</span>
         </div>
-        <div class="font-semibold text-rose-700">${h.category}</div>
+        <div class="font-semibold" style="color:${sev.color}">${h.category}</div>
         <p class="mt-1 text-slate-700 leading-snug">${h.summary}</p>
         <div class="mt-2 pt-1 border-t border-slate-100 flex items-center justify-between text-[11px]">
-          <span class="font-bold text-rose-600">Urgency: ${h.avg_urgency}/10</span>
+          <span class="font-bold" style="color:${sev.color}">Severity: ${h.avg_urgency}/10 (${sev.label})</span>
           <span class="text-slate-500 font-semibold">${h.incident_count} reports</span>
         </div>
       </div>
@@ -209,11 +255,11 @@ function renderHotspots(hotspots) {
     // Clicking the circle highlights the sector and shows toast
     circle.on('click', () => {
       highlightSectorOnMap(h.sector, false);
-      showToast(`Hotspot Selected: ${h.sector}`, `${h.category} demand cluster with ${h.incident_count} reports.`, 'info');
+      showToast(`Cluster: ${h.sector}`, `${h.category} - ${sev.label} with ${h.incident_count} reports.`, h.avg_urgency >= 8 ? 'warning' : 'info');
     });
 
     hotspotsLayer.addLayer(circle);
-    hotspotCircleMap.push({ sector: h.sector, circle: circle, data: h, baseRadius: baseRadius });
+    hotspotCircleMap.push({ sector: h.sector, circle: circle, data: h, baseRadius: baseRadius, severity: sev });
   });
 
   // Re-apply highlight if a sector is currently selected
@@ -227,16 +273,15 @@ function renderMarkers(grievances) {
   grievanceMarkers = [];
 
   grievances.forEach(g => {
-    const isCritical = g.urgency_score >= 8;
-    const markerColor = isCritical ? '#e11d48' : (g.urgency_score >= 5 ? '#d97706' : '#059669');
+    const markerColor = getMarkerColor(g.urgency_score);
 
     const marker = L.circleMarker([g.lat, g.lng], {
-      radius: 7,
+      radius: 6,
       fillColor: markerColor,
       color: '#ffffff',
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 0.9
+      weight: 1.5,
+      opacity: 0.9,
+      fillOpacity: 0.85
     }).bindPopup(`
       <div class="text-xs font-sans p-1">
         <div class="flex items-center gap-1.5 mb-1">
@@ -271,31 +316,32 @@ function highlightSectorOnMap(sectorName, flyTo = true) {
   const targetNorm = sectorName.toLowerCase().replace(/[^a-z0-9]/g, '');
   let matchedEntry = null;
 
-  // 1. DYNAMICALLY UPDATE HEATMAP CIRCLES
+  // 1. DYNAMICALLY UPDATE HEATMAP CIRCLES WITH SEVERITY COLOR RETENTION & LOCALIZED RADIUS
   hotspotCircleMap.forEach(item => {
     const itemNorm = item.sector.toLowerCase().replace(/[^a-z0-9]/g, '');
     const isMatch = itemNorm.includes(targetNorm) || targetNorm.includes(itemNorm);
+    const sev = item.severity || getHotspotSeverity(item.data.avg_urgency);
 
     if (isMatch) {
       matchedEntry = item;
-      // Highlighting circle: larger radius, prominent border, vibrant fill
+      // Highlighting circle: keep true severity color (Red/Purple/Blue/Green), vibrant fill & clean border
       item.circle.setStyle({
-        color: '#be123c',
-        fillColor: '#f43f5e',
+        color: sev.color,
+        fillColor: sev.fillColor,
         fillOpacity: 0.65,
-        weight: 4
+        weight: 3.5
       });
-      item.circle.setRadius(item.baseRadius * 1.35);
+      item.circle.setRadius(item.baseRadius * 1.15);
       item.circle.bringToFront();
     } else {
-      // Dim other circles
+      // Dim other circles but preserve their distinct color hue at subtle opacity
       item.circle.setStyle({
-        color: '#94a3b8',
-        fillColor: '#cbd5e1',
-        fillOpacity: 0.08,
+        color: sev.color,
+        fillColor: sev.fillColor,
+        fillOpacity: 0.12,
         weight: 1
       });
-      item.circle.setRadius(item.baseRadius * 0.85);
+      item.circle.setRadius(item.baseRadius * 0.9);
     }
   });
 
@@ -304,14 +350,14 @@ function highlightSectorOnMap(sectorName, flyTo = true) {
     const itemNorm = item.sector.toLowerCase().replace(/[^a-z0-9]/g, '');
     const isMatch = itemNorm.includes(targetNorm) || targetNorm.includes(itemNorm);
     if (isMatch) {
-      item.marker.setStyle({ opacity: 1, fillOpacity: 0.95, radius: 9, weight: 3 });
+      item.marker.setStyle({ opacity: 1, fillOpacity: 0.95, radius: 8, weight: 3 });
       item.marker.bringToFront();
     } else {
-      item.marker.setStyle({ opacity: 0.25, fillOpacity: 0.15, radius: 5, weight: 1 });
+      item.marker.setStyle({ opacity: 0.2, fillOpacity: 0.15, radius: 4, weight: 1 });
     }
   });
 
-  // 3. PAN / FLY TO SECTOR
+  // 3. PAN / FLY TO SECTOR AT ZOOM 15 (FOCUSED DIRECTLY ON LOCALIZED NEIGHBORHOOD)
   let targetCoords = null;
   for (const [k, coords] of Object.entries(SECTOR_COORDS)) {
     if (targetNorm.includes(k) || k.includes(targetNorm)) {
@@ -324,7 +370,7 @@ function highlightSectorOnMap(sectorName, flyTo = true) {
   }
 
   if (map && targetCoords && flyTo) {
-    map.flyTo(targetCoords, 14, { duration: 0.8 });
+    map.flyTo(targetCoords, 15, { duration: 0.8 });
   }
 
   // 4. OPEN POPUP IF MATCHED
@@ -345,41 +391,42 @@ function highlightSectorOnMap(sectorName, flyTo = true) {
     activeBtn.classList.add('bg-emerald-600', 'text-white', 'shadow-sm');
   }
 
-  // 6. UPDATE ACTIVE BADGE
+  // 6. UPDATE ACTIVE BADGE WITH SEVERITY ACCENT
   const badge = document.getElementById('activeHotspotBadge');
   const badgeText = document.getElementById('activeHotspotText');
   if (badge && badgeText) {
     badge.classList.remove('hidden');
     badge.classList.add('inline-flex');
-    badgeText.textContent = `${sectorName} Heatmap Active`;
+    const sevLabel = matchedEntry ? ` • ${matchedEntry.severity.label}` : '';
+    badgeText.textContent = `${sectorName}${sevLabel}`;
   }
 }
 
 function resetSectorFilter() {
   activeSelectedSector = null;
 
-  // Restore all hotspot circles
+  // Restore all hotspot circles to their respective severity colors & base radii
   hotspotCircleMap.forEach(item => {
+    const sev = item.severity || getHotspotSeverity(item.data.avg_urgency);
     item.circle.setStyle({
-      color: '#e11d48',
-      fillColor: '#f43f5e',
-      fillOpacity: 0.28,
+      color: sev.color,
+      fillColor: sev.fillColor,
+      fillOpacity: 0.35,
       weight: 2
     });
     item.circle.setRadius(item.baseRadius);
   });
 
-  // Restore all markers
+  // Restore all markers to original severity colors
   grievanceMarkers.forEach(item => {
-    const isCritical = item.data.urgency_score >= 8;
-    const col = isCritical ? '#e11d48' : (item.data.urgency_score >= 5 ? '#d97706' : '#059669');
+    const col = getMarkerColor(item.data.urgency_score);
     item.marker.setStyle({
-      radius: 7,
+      radius: 6,
       fillColor: col,
       color: '#ffffff',
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 0.9
+      weight: 1.5,
+      opacity: 0.9,
+      fillOpacity: 0.85
     });
   });
 
@@ -406,7 +453,7 @@ function resetSectorFilter() {
   }
 
   resetMapView();
-  showToast("Heatmap Filter Reset", "Viewing all Tricity infrastructure clusters.", "info");
+  showToast("Heatmap Filter Reset", "Viewing all Tricity severity clusters.", "info");
 }
 
 function fillSample(id) {
@@ -425,26 +472,26 @@ function fillSample(id) {
     radios[0].checked = true; // VOICE
     input.value = "ਸਾਡੇ ਸੈਕਟਰ 22 ਸ਼ਾਸਤਰੀ ਮਾਰਕੀਟ ਕੋਲ ਪਾਣੀ ਦੀ ਮੁੱਖ ਪਾਈਪ ਫਟ ਗਈ ਹੈ, ਪੂਰੀ ਸੜਕ ਤੇ ਪਾਣੀ ਭਰ ਗਿਆ ਹੈ ਤੇ ਦੁਕਾਨਾਂ ਵਿੱਚ ਜਾ ਰਿਹਾ ਹੈ।";
     targetSector = "Sector 22";
-    if (btn) btn.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-50');
-    showToast("Sector 22 Selected", "Heatmap focused on Sector 22 water supply burst cluster.", "info");
+    if (btn) btn.classList.add('ring-2', 'ring-rose-500', 'bg-rose-50');
+    showToast("Sector 22 Selected", "Critical water main burst (Urgency 9/10) focused in Sector 22 Shastri Market.", "warning");
   } else if (id === 2) {
     radios[1].checked = true; // WHATSAPP
     input.value = "सेक्टर 35 सी होटल स्ट्रिप के पीछे मुख्य सड़क पर बहुत बड़े गड्ढे हैं जिससे कल रात एक स्कूटी वाले का एक्सीडेंट हो गया।";
     targetSector = "Sector 35";
-    if (btn) btn.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50');
-    showToast("Sector 35 Selected", "Heatmap focused on Sector 35 pothole risk cluster.", "info");
+    if (btn) btn.classList.add('ring-2', 'ring-purple-500', 'bg-purple-50');
+    showToast("Sector 35 Selected", "Severe road pothole risk (Urgency 8/10) focused in Sector 35C.", "info");
   } else if (id === 3) {
     radios[0].checked = true; // VOICE
     input.value = "ਫੇਜ਼ 7 ਮੋਹਾਲੀ ਮਾਰਕੀਟ ਦੀਆਂ ਸਟਰੀਟ ਲਾਈਟਾਂ ਪਿਛਲੇ 10 ਦਿਨਾਂ ਤੋਂ ਬੰਦ ਹਨ, ਸ਼ਾਮ ਨੂੰ ਹਨੇਰੇ ਕਾਰਨ ਚੋਰੀਆਂ ਦਾ ਡਰ ਹੈ।";
     targetSector = "Phase 7 Mohali";
     if (btn) btn.classList.add('ring-2', 'ring-purple-500', 'bg-purple-50');
-    showToast("Phase 7 Mohali Selected", "Heatmap focused on Phase 7 Mohali dark streetlight zone.", "info");
+    showToast("Phase 7 Mohali Selected", "Severe dark streetlight outage (Urgency 8/10) focused in Phase 7 Mohali Market.", "info");
   } else if (id === 4) {
     radios[2].checked = true; // WEB
     input.value = "Dangerous live wires hanging from electric pole outside school in Sector 15 Patel Market.";
     targetSector = "Sector 15";
     if (btn) btn.classList.add('ring-2', 'ring-rose-500', 'bg-rose-50');
-    showToast("Sector 15 Selected", "Heatmap focused on Sector 15 school live wires critical hazard.", "warning");
+    showToast("Sector 15 Selected", "Critical live wires hazard (Urgency 10/10) focused in Sector 15 Patel Market.", "error");
   }
 
   onInputFeedback();
@@ -524,7 +571,7 @@ async function submitGrievance(event) {
       INITIAL_HOTSPOTS.push(h);
     }
 
-    // 3. RE-RENDER HEATMAP CIRCLES WITH EXPANDED RADIUS & PULSE!
+    // 3. RE-RENDER HEATMAP CIRCLES WITH LOCALIZED RADIUS & SEVERITY COLOR
     renderHotspots(INITIAL_HOTSPOTS);
 
     // 4. FOCUS & HIGHLIGHT THE UPDATED CIRCLE ON THE HEATMAP!
@@ -550,11 +597,13 @@ function prependGrievanceToFeed(g) {
   item.className = 'pt-2.5 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-200 transition cursor-pointer hover:bg-emerald-100/60';
   item.onclick = () => highlightSectorOnMap(g.sector, true);
 
+  const markerColor = getMarkerColor(g.urgency_score);
+
   item.innerHTML = `
     <div class="flex items-start justify-between gap-2">
       <div>
         <div class="flex items-center gap-1.5 flex-wrap">
-          <span class="px-1.5 py-0.5 rounded text-[10px] font-bold text-white bg-rose-600">${g.urgency_score}/10</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-bold text-white" style="background:${markerColor}">${g.urgency_score}/10</span>
           <span class="text-xs font-bold text-slate-800">${g.id}</span>
           <span class="text-[10px] bg-slate-100 text-slate-600 px-1 rounded">${g.channel}</span>
           <span class="text-[10px] text-emerald-700 font-bold hover:underline">${g.sector} <i class="fa-solid fa-location-crosshairs text-[9px]"></i></span>

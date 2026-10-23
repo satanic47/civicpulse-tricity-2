@@ -16,7 +16,7 @@ TRICITY_SECTORS: Dict[str, Dict[str, Any]] = {
     "Sector 11": {"lat": 30.7560, "lng": 76.7710, "ward": 3, "zone": "Central", "population": 16000, "landmarks": ["PG Govt College for Boys"]},
     "Sector 12": {"lat": 30.7640, "lng": 76.7760, "ward": 3, "zone": "North", "population": 8500, "landmarks": ["PGI", "PEC University"]},
     "Sector 14": {"lat": 30.7600, "lng": 76.7640, "ward": 3, "zone": "West", "population": 19000, "landmarks": ["Panjab University", "Student Centre"]},
-    "Sector 15": {"lat": 30.7510, "lng": 76.7620, "ward": 4, "zone": "West", "population": 28500, "landmarks": ["Patel Market", "DCM School"]},
+    "Sector 15": {"lat": 30.7510, "lng": 76.7710, "ward": 4, "zone": "West", "population": 28500, "landmarks": ["Patel Market", "DCM School"]},
     "Sector 16": {"lat": 30.7440, "lng": 76.7730, "ward": 4, "zone": "Central", "population": 15500, "landmarks": ["Zakir Hussain Rose Garden", "Cricket Stadium", "GMSH 16"]},
     "Sector 17": {"lat": 30.7398, "lng": 76.7827, "ward": 5, "zone": "Central", "population": 3500, "landmarks": ["Sector 17 Plaza", "ISBT 17", "DC Office"]},
     "Sector 18": {"lat": 30.7310, "lng": 76.7910, "ward": 5, "zone": "Central", "population": 14000, "landmarks": ["Tagore Theatre", "Rotary Club"]},
