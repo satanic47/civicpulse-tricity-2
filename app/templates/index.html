@@ -192,12 +192,31 @@
               </span>
             </div>
           </div>
+          <!-- INTERACTIVE SECTOR FOCUS FILTER BAR -->
+          <div class="px-5 py-2.5 bg-slate-50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-slate-600 font-semibold text-[11px]"><i class="fa-solid fa-layer-group text-emerald-600 mr-1"></i>Sector Focus:</span>
+              <button onclick="resetSectorFilter()" id="filter-all" class="sector-pill px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-xs shadow-sm transition">All Tricity</button>
+              <button onclick="highlightSectorOnMap('Sector 15')" id="filter-Sector-15" class="sector-pill px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs border border-slate-200 transition">Sector 15</button>
+              <button onclick="highlightSectorOnMap('Sector 22')" id="filter-Sector-22" class="sector-pill px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs border border-slate-200 transition">Sector 22</button>
+              <button onclick="highlightSectorOnMap('Sector 35')" id="filter-Sector-35" class="sector-pill px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs border border-slate-200 transition">Sector 35</button>
+              <button onclick="highlightSectorOnMap('Phase 7 Mohali')" id="filter-Phase-7-Mohali" class="sector-pill px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs border border-slate-200 transition">Phase 7 Mohali</button>
+              <button onclick="highlightSectorOnMap('Sector 20')" id="filter-Sector-20" class="sector-pill px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs border border-slate-200 transition">Sector 20</button>
+            </div>
+            <div id="activeHotspotBadge" class="hidden items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[11px]">
+              <span class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
+              <span id="activeHotspotText">Active Cluster</span>
+            </div>
+          </div>
+
           <div class="p-3">
             <div id="map"></div>
           </div>
           <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 text-xs text-slate-500 flex flex-wrap items-center justify-between">
             <span>Centroids calculated over Le Corbusier sector grids (Sectors 1-60, Mohali Phases, Panchkula)</span>
-            <button onclick="resetMapView()" class="text-emerald-600 hover:text-emerald-700 font-semibold text-xs">Reset View</button>
+            <button onclick="resetSectorFilter()" class="text-emerald-600 hover:text-emerald-700 font-semibold text-xs flex items-center gap-1">
+              <i class="fa-solid fa-arrows-rotate"></i> Reset View
+            </button>
           </div>
         </div>
 
@@ -215,7 +234,7 @@
 
           <div class="p-4 divide-y divide-slate-100 space-y-3" id="recommendationsList">
             {% for rec in recommendations %}
-            <div class="pt-3 first:pt-0">
+            <div class="pt-3 first:pt-0 cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition" onclick="highlightSectorOnMap('{{ rec.sector_or_ward }}', true)">
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <div class="flex items-center gap-2">
@@ -263,21 +282,33 @@
             <div>
               <p class="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Test Instant Realistic Samples:</p>
               <div class="grid grid-cols-2 gap-2 text-xs">
-                <button onclick="fillSample(1)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200">
-                  <span class="font-bold text-emerald-700 block font-gurmukhi">ਸੈਕਟਰ 22 (ਪਾਣੀ ਲੀਕ)</span>
-                  <span class="text-[10px] text-slate-500">Punjabi Voice Note</span>
+                <button id="sample-btn-1" onclick="fillSample(1)" class="sample-btn p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200 group">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-emerald-700 block font-gurmukhi group-hover:text-emerald-800">ਸੈਕਟਰ 22 (ਪਾਣੀ ਲੀਕ)</span>
+                    <i class="fa-solid fa-location-crosshairs text-emerald-500 text-xs opacity-60 group-hover:opacity-100"></i>
+                  </div>
+                  <span class="text-[10px] text-slate-500">Punjabi Voice Note • Focus Map</span>
                 </button>
-                <button onclick="fillSample(2)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200">
-                  <span class="font-bold text-blue-700 block font-devanagari">सेक्टर 35 (सड़क गड्ढे)</span>
-                  <span class="text-[10px] text-slate-500">Hindi WhatsApp Text</span>
+                <button id="sample-btn-2" onclick="fillSample(2)" class="sample-btn p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200 group">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-blue-700 block font-devanagari group-hover:text-blue-800">सेक्टर 35 (सड़क गड्ढे)</span>
+                    <i class="fa-solid fa-location-crosshairs text-blue-500 text-xs opacity-60 group-hover:opacity-100"></i>
+                  </div>
+                  <span class="text-[10px] text-slate-500">Hindi WhatsApp Text • Focus Map</span>
                 </button>
-                <button onclick="fillSample(3)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200">
-                  <span class="font-bold text-purple-700 block font-gurmukhi">ਫੇਜ਼ 7 ਮੋਹਾਲੀ (ਲਾਈਟਾਂ)</span>
-                  <span class="text-[10px] text-slate-500">Punjabi Night Safety</span>
+                <button id="sample-btn-3" onclick="fillSample(3)" class="sample-btn p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200 group">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-purple-700 block font-gurmukhi group-hover:text-purple-800">ਫੇਜ਼ 7 ਮੋਹਾਲੀ (ਲਾਈਟਾਂ)</span>
+                    <i class="fa-solid fa-location-crosshairs text-purple-500 text-xs opacity-60 group-hover:opacity-100"></i>
+                  </div>
+                  <span class="text-[10px] text-slate-500">Punjabi Night Safety • Focus Map</span>
                 </button>
-                <button onclick="fillSample(4)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200">
-                  <span class="font-bold text-rose-700 block">Sector 15 (Live Wires)</span>
-                  <span class="text-[10px] text-slate-500">Critical School Hazard</span>
+                <button id="sample-btn-4" onclick="fillSample(4)" class="sample-btn p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200 group">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-rose-700 block group-hover:text-rose-800">Sector 15 (Live Wires)</span>
+                    <i class="fa-solid fa-location-crosshairs text-rose-500 text-xs opacity-60 group-hover:opacity-100"></i>
+                  </div>
+                  <span class="text-[10px] text-slate-500">Critical School Hazard • Focus Map</span>
                 </button>
               </div>
             </div>
@@ -352,7 +383,7 @@
 
           <div class="p-3 divide-y divide-slate-100 max-h-[380px] overflow-y-auto space-y-2.5" id="grievanceFeed">
             {% for g in grievances %}
-            <div class="pt-2.5 first:pt-0">
+            <div class="pt-2.5 first:pt-0 cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition" onclick="highlightSectorOnMap('{{ g.sector }}', true)">
               <div class="flex items-start justify-between gap-2">
                 <div>
                   <div class="flex items-center gap-1.5 flex-wrap">
