@@ -71,7 +71,7 @@ CivicPulse Tricity is a scalable, multilingual AI platform engineered as an open
 ## Field 3: Share your GitHub repository link with public access (URL)
 *Repository URL:*
 ```
-https://github.com/satanic47/civicpulse-tricity
+https://github.com/satanic47/civicpulse-tricity-2
 ```
 
 ### How to push the code to your GitHub:
@@ -81,7 +81,7 @@ git init
 git add .
 git commit -m "feat: initial release of CivicPulse Tricity (NagrikSetu AI)"
 git branch -M main
-git remote add origin https://github.com/satanic47/civicpulse-tricity.git
+git remote add origin https://github.com/satanic47/civicpulse-tricity-2-2.git
 git push -u origin main
 ```
 *(If the repo does not exist on GitHub yet, create a new public repository named `civicpulse-tricity` on https://github.com/new and then run the push command above).*

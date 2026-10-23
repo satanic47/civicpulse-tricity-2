@@ -96,7 +96,7 @@ Rather than viewing complaints in isolation, the Policy Recommender aggregates c
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/satanic47/civicpulse-tricity.git
+   git clone https://github.com/satanic47/civicpulse-tricity-2-2.git
    cd civicpulse-tricity
    ```
 
