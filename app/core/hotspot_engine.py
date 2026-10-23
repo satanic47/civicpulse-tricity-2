@@ -25,8 +25,8 @@ class HotspotEngine:
             center_lat = sum(i.get("lat", 30.7398) for i in items) / max(1, count)
             center_lng = sum(i.get("lng", 76.7827) for i in items) / max(1, count)
 
-            # A hotspot is surfaced when incident count >= 2 or urgency >= 8
-            if count >= 2 or avg_urgency >= 8.0:
+            # A hotspot is surfaced for every reported sector issue
+            if count >= 1:
                 hotspots.append({
                     "cluster_id": f"HOTSPOT-TRICITY-{cluster_counter:03d}",
                     "sector": sector,
