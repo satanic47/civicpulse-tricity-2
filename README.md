@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg)](https://fastapi.tiangolo.com/)
-[![Google Gemini 1.5](https://img.shields.io/badge/Google%20AI-Gemini%201.5-4285F4.svg)](https://ai.google.dev/)
+[![Google Gemini 2.0 Flash](https://img.shields.io/badge/Google%20AI-Gemini%201.5-4285F4.svg)](https://ai.google.dev/)
 [![Tests: 21 Passing](https://img.shields.io/badge/Tests-21%2F21%20Passing-brightgreen.svg)]()
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](Dockerfile)
 
@@ -21,7 +21,7 @@ Governments across India struggle to consolidate citizen feedback and align it w
 
 **CivicPulse Tricity (NagrikSetu AI)** is a scalable, multilingual AI platform engineered as an open **Digital Public Good (DPG)**. It aggregates citizen development and maintenance requests across **Punjabi, Hindi, and English** via voice, text, and messaging channels.
 
-Powered by **Google Gemini 1.5**, the platform:
+Powered by **Google Gemini 2.0 Flash**, the platform:
 1. Normalizes and translates multilingual citizen complaints in real-time.
 2. Performs automated hazard urgency scoring (1–10) and departmental routing.
 3. Maps colloquial landmarks to **Le Corbusier Chandigarh Sector grids** (Sectors 1–60, Mohali Phases, and Panchkula).
@@ -41,7 +41,7 @@ flowchart TD
     end
 
     subgraph Intelligence["2. Google AI Core"]
-        API --> GEMINI[Google Gemini 1.5 Flash\nMultimodal & Multilingual Engine]
+        API --> GEMINI[Google Gemini 2.0 Flash\nMultimodal & Multilingual Engine]
         GEMINI --> NORM[Dialect Normalization & Translation]
         GEMINI --> URGENCY[Hazard Urgency Scoring 1-10]
         GEMINI --> ROUTE[Departmental Triage\nB&R, Water, Power, Sanitation]

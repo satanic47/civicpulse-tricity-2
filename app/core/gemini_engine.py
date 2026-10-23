@@ -6,36 +6,60 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-# Check for Google Gemini SDK availability
+# Primary: Official Unified Google GenAI SDK (Modern standard)
 try:
-    import google.generativeai as genai
-    HAS_GENAI = True
+    from google import genai
+    from google.genai import types
+    HAS_NEW_GENAI = True
 except ImportError:
-    HAS_GENAI = False
+    HAS_NEW_GENAI = False
+
+# Fallback: Legacy google.generativeai wrapper (only if modern SDK not installed)
+HAS_LEGACY_GENAI = False
+if not HAS_NEW_GENAI:
+    try:
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            import google.generativeai as legacy_genai
+        HAS_LEGACY_GENAI = True
+    except ImportError:
+        HAS_LEGACY_GENAI = False
 
 class GeminiCivicEngine:
     """
-    Multilingual AI Engine powered by Google Gemini 1.5 Flash/Pro with local deterministic fallback.
+    Multilingual AI Engine powered by Google Gemini 2.0 Flash (with Gemini 1.5 & sovereign deterministic fallback).
     Aggregates, translates, classifies citizen grievances and generates Municipal Policy Reports.
     """
 
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        self.model = None
-        if self.api_key and HAS_GENAI:
-            try:
-                genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel("gemini-1.5-flash")
-                logger.info("Initialized Google Gemini 1.5 Flash for CivicPulse Tricity.")
-            except Exception as e:
-                logger.warning(f"Failed to configure Gemini SDK: {e}. Falling back to deterministic NLP.")
+        self.client = None
+        self.legacy_model = None
+        self.active_model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+
+        if self.api_key:
+            if HAS_NEW_GENAI:
+                try:
+                    self.client = genai.Client(api_key=self.api_key)
+                    logger.info(f"Initialized Google GenAI SDK ({self.active_model_name}) for CivicPulse Tricity.")
+                except Exception as e:
+                    logger.warning(f"Failed to configure new GenAI client: {e}")
+
+            if not self.client and HAS_LEGACY_GENAI:
+                try:
+                    legacy_genai.configure(api_key=self.api_key)
+                    self.legacy_model = legacy_genai.GenerativeModel(self.active_model_name)
+                    logger.info(f"Initialized Google Gemini ({self.active_model_name}) via legacy wrapper.")
+                except Exception as e:
+                    logger.warning(f"Failed to configure legacy Gemini SDK: {e}. Falling back to deterministic NLP.")
 
     def analyze_grievance(self, text: str, channel: str = "WEB") -> Dict[str, Any]:
         """
         Processes multilingual citizen feedback (Punjabi / Hindi / English).
         Returns structured canonical classification, urgency, sentiment, and sector info.
         """
-        if self.model:
+        if self.client or self.legacy_model:
             try:
                 return self._analyze_with_gemini(text, channel)
             except Exception as e:
@@ -63,12 +87,41 @@ class GeminiCivicEngine:
             "summary": "<Concise 1-sentence executive summary for municipal engineers>"
         }}
         """
-        response = self.model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"}
-        )
-        data = json.loads(response.text)
-        return data
+
+        # 1. Execute via official Google GenAI SDK
+        if self.client:
+            try:
+                response = self.client.models.generate_content(
+                    model=self.active_model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json"
+                    )
+                )
+                return json.loads(response.text)
+            except Exception as primary_err:
+                logger.warning(f"Primary model {self.active_model_name} failed: {primary_err}. Attempting adaptive fallback...")
+                if self.active_model_name != "gemini-1.5-flash":
+                    try:
+                        fallback_resp = self.client.models.generate_content(
+                            model="gemini-1.5-flash",
+                            contents=prompt,
+                            config=types.GenerateContentConfig(response_mime_type="application/json")
+                        )
+                        return json.loads(fallback_resp.text)
+                    except Exception:
+                        pass
+                raise primary_err
+
+        # 2. Execute via legacy wrapper if new SDK unavailable
+        if self.legacy_model:
+            response = self.legacy_model.generate_content(
+                prompt,
+                generation_config={"response_mime_type": "application/json"}
+            )
+            return json.loads(response.text)
+
+        raise RuntimeError("No active Gemini model available")
 
     def _analyze_deterministic(self, text: str, channel: str) -> Dict[str, Any]:
         """

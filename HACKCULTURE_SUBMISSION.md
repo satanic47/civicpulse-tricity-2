@@ -22,14 +22,14 @@ Governments across Indian cities struggle with fragmented citizen grievance mech
 #### 2. The Solution: NagrikSetu AI
 CivicPulse Tricity is a scalable, multilingual AI platform engineered as an open Digital Public Good (DPG). It bridges the gap between grassroots citizen voice and municipal capital works:
 1. **Omnichannel Voice & Text Ingestion:** Citizens submit infrastructure requests via voice notes, WhatsApp messages, or web in Punjabi, Hindi, or English.
-2. **Google Gemini Multilingual Normalization:** Google Gemini 1.5 Flash ingests raw voice transcripts and messages, detects dialects, and standardizes them into structured canonical schemas.
+2. **Google Gemini Multilingual Normalization:** Google Gemini 2.0 Flash ingests raw voice transcripts and messages, detects dialects, and standardizes them into structured canonical schemas.
 3. **Automated Urgency Scoring & Routing:** The system calculates a 1–10 hazard urgency score (e.g., exposed electric wires = 10, burst water mains = 9) and automatically routes tickets to the appropriate municipal department (Engineering B&R Roads, Public Health & Water, Electricity, or Sanitation).
 4. **Tricity Landmark & Sector Geocoding:** Colloquial landmarks ("Kiran Cinema", "Patel Market", "PU Gate 2") are dynamically mapped to Le Corbusier sector grids (Sectors 1–60, Mohali Phases, Panchkula).
 5. **Demand Hotspot Clustering:** Geographic clustering groups individual complaints into high-density demand hotspots, computing localized infrastructure health scores.
 6. **Municipal Policy & Capital DPR Copilot:** Gemini AI cross-references aggregated citizen reports with census demographics and ward budgets to generate executive Detailed Project Reports (DPRs) with budget estimations for municipal commissioners.
 
 #### 3. AI & Technical Architecture
-- **AI Core:** Google Gemini 1.5 Flash / Pro API with an open-weight Gemma fallback for 100% offline sovereign municipal deployment.
+- **AI Core:** Google Gemini 2.0 Flash / Pro API with an open-weight Gemma fallback for 100% offline sovereign municipal deployment.
 - **Backend:** High-performance Python FastAPI service with Pydantic validation and 21 automated integration tests (100% pass rate).
 - **Frontend & GIS:** Responsive dashboard featuring interactive Leaflet.js sector heatmaps, real-time demand clustering, and Chart.js analytics for department workloads.
 - **Deployment:** 100% containerized with Docker and docker-compose; deployable on municipal servers in under 5 minutes.

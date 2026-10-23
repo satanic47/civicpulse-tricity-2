@@ -1,3 +1,56 @@
+
+function onInputFeedback() {
+  const el = document.getElementById('rawInput');
+  const countEl = document.getElementById('charCount');
+  const warningEl = document.getElementById('hazardWarning');
+  if (!el) return;
+
+  const val = el.value || '';
+  if (countEl) countEl.textContent = `${val.length} / 2500`;
+
+  const lower = val.toLowerCase();
+  const hazardKeywords = ['wire', 'spark', 'shock', 'accident', 'burst', 'overflow', 'fire', 'current', 'death', 'hospital', 'school', 'danger', 'ਤਾਰਾਂ', 'ਫਟ', 'ਕਰੰਟ', 'ਖ਼ਤਰਾ', 'तार', 'करंट', 'खतरा'];
+  const hasHazard = hazardKeywords.some(kw => lower.includes(kw));
+
+  if (warningEl) {
+    if (hasHazard) {
+      warningEl.classList.remove('hidden');
+    } else {
+      warningEl.classList.add('hidden');
+    }
+  }
+}
+
+function showToast(title, message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  const isErr = type === 'error';
+  const borderCol = isErr ? 'border-rose-500' : 'border-emerald-500';
+  const bgCol = isErr ? 'bg-rose-950/95 text-rose-200' : 'bg-slate-900/95 text-slate-100';
+  const icon = isErr ? 'fa-circle-xmark text-rose-400' : 'fa-circle-check text-emerald-400';
+
+  toast.className = `pointer-events-auto flex items-start gap-3 p-3.5 rounded-xl border ${borderCol} ${bgCol} shadow-xl shadow-black/40 text-xs backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0 max-w-sm`;
+  toast.innerHTML = `
+    <i class="fa-solid ${icon} text-base mt-0.5"></i>
+    <div class="flex-1">
+      <div class="font-bold text-white">${title}</div>
+      <div class="text-[11px] text-slate-300 mt-0.5">${message}</div>
+    </div>
+  `;
+
+  container.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.classList.remove('translate-y-2', 'opacity-0');
+  });
+
+  setTimeout(() => {
+    toast.classList.add('opacity-0', 'translate-y-2');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
 let map;
 let markersLayer;
 let hotspotsLayer;
@@ -102,6 +155,7 @@ function fillSample(id) {
     radios[2].checked = true; // WEB
     input.value = "Dangerous live wires hanging from electric pole outside school in Sector 15 Patel Market.";
   }
+  onInputFeedback();
 }
 
 async function submitGrievance(event) {
@@ -113,7 +167,7 @@ async function submitGrievance(event) {
   if (!rawInput) return;
 
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing with Gemini AI...';
+  submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing via Google Gemini 2.0 Flash...';
 
   try {
     const res = await fetch('/api/v1/grievances', {
@@ -139,6 +193,7 @@ async function submitGrievance(event) {
 
     // Prepend to feed
     prependGrievanceToFeed(data);
+    showToast(`Grievance ${data.id} Triaged`, `${data.category} in ${data.sector} routed to ${data.department}.`, 'success');
 
     // Update markers
     INITIAL_GRIEVANCES.unshift(data);
@@ -154,10 +209,10 @@ async function submitGrievance(event) {
     totalEl.textContent = parseInt(totalEl.textContent) + 1;
 
   } catch (err) {
-    alert("Error processing grievance: " + err.message);
+    showToast("Submission Error", err.message, "error");
   } finally {
     submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Triage via Google Gemini AI';
+    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Triage via Google Gemini 2.0 Flash';
   }
 }
 
@@ -198,6 +253,7 @@ async function upvoteIssue(id) {
       const data = await res.json();
       const el = document.getElementById(`upvotes-${id}`);
       if (el) el.textContent = data.upvotes;
+      showToast("Consensus Upvoted", `Grievance #${id} prioritized by community.`, "success");
     }
   } catch (err) {
     console.error("Upvote failed", err);
