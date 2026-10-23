@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicPulse Tricity — NagrikSetu AI (Chandigarh Digital Public Infrastructure)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Gurmukhi:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-gurmukhi { font-family: 'Noto Sans Gurmukhi', sans-serif; }
+    .font-devanagari { font-family: 'Noto Sans Devanagari', sans-serif; }
+    #map { height: 500px; border-radius: 0.75rem; z-index: 10; }
+    .pulse-ring {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      50% { transform: scale(1.15); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.9; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- OFFICIAL CHANDIGARH UT UTILITY ACCESS BAR -->
+  <div class="bg-[#06101e] text-slate-300 text-[11px] py-1 px-4 sm:px-6 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-3">
+      <span class="flex items-center gap-1.5 text-amber-400 font-semibold">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>Chandigarh Smart City Integrated Command &amp; Control Centre (ICCC)</span>
+      </span>
+      <span class="text-slate-600 hidden sm:inline">|</span>
+      <span class="text-slate-400 hidden sm:inline">Citizen Helpline: <strong class="text-white">155304</strong> / <strong class="text-white">112</strong></span>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="https://shivysidinfo.tech" target="_blank" class="text-orange-400 hover:text-orange-300 transition font-medium">← Portfolio Hub</a>
+      <span class="text-slate-700">|</span>
+      <a href="presentation/index.html" class="text-slate-300 hover:text-white transition font-medium">Pitch Deck 📊</a>
+      <span class="text-slate-700">|</span>
+      <span class="text-slate-400 font-mono">UT Chandigarh</span>
+    </div>
+  </div>
+
+  <!-- TRICOLOR TOP STRIP (CHANDIGARH UT / INDIA DPI) -->
+  <div class="h-1.5 w-full bg-gradient-to-r from-amber-500 via-white to-emerald-600"></div>
+
+  <!-- TOP BANNER: CHANDIGARH ADMINISTRATION AESTHETIC -->
+  <header class="bg-[#0b1d33] text-white border-b border-slate-800 sticky top-0 z-50 shadow-lg relative overflow-hidden">
+    
+    <!-- 35% TRANSPARENT OPEN HAND WATERMARK (HEADER RIGHT) -->
+    <div class="absolute -right-6 -bottom-6 w-44 h-44 pointer-events-none select-none text-white/35 z-0" style="opacity: 0.35;">
+      <svg viewBox="0 0 100 100" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg">
+        <!-- Official Le Corbusier Open Hand Monument Silhouette -->
+        <path d="M50 8 C46 16 38 24 30 30 C24 35 18 42 16 50 C14 58 17 65 24 68 C28 70 32 68 35 64 C37 60 38 54 39 48 C41 44 43 42 45 44 C44 50 43 56 43 62 C43 66 45 70 49 71 C53 72 56 69 57 65 C58 58 59 50 61 42 C63 38 66 36 68 39 C67 46 66 53 66 60 C66 64 68 67 72 68 C76 68 78 65 79 61 C81 53 84 45 88 38 C91 32 94 28 92 24 C90 20 85 22 81 26 C75 32 69 40 65 48 C66 38 67 28 68 18 C68 12 65 8 61 8 C57 8 54 12 53 18 C52 24 51 32 50 40 C49 32 50 20 50 8 Z" />
+        <path d="M46 72 L46 92 L38 92 L38 96 L62 96 L62 92 L54 92 L54 72 Z" />
+      </svg>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4 relative z-10">
+      
+      <!-- Logo & Administration Titles -->
+      <div class="flex items-center space-x-3.5">
+        <!-- Open Hand Monument Official Emblem -->
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-b from-amber-500/20 to-slate-900 border border-amber-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
+          <svg viewBox="0 0 100 100" class="w-full h-full text-amber-400 drop-shadow" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 8 C46 16 38 24 30 30 C24 35 18 42 16 50 C14 58 17 65 24 68 C28 70 32 68 35 64 C37 60 38 54 39 48 C41 44 43 42 45 44 C44 50 43 56 43 62 C43 66 45 70 49 71 C53 72 56 69 57 65 C58 58 59 50 61 42 C63 38 66 36 68 39 C67 46 66 53 66 60 C66 64 68 67 72 68 C76 68 78 65 79 61 C81 53 84 45 88 38 C91 32 94 28 92 24 C90 20 85 22 81 26 C75 32 69 40 65 48 C66 38 67 28 68 18 C68 12 65 8 61 8 C57 8 54 12 53 18 C52 24 51 32 50 40 C49 32 50 20 50 8 Z" />
+            <path d="M46 72 L46 92 L38 92 L38 96 L62 96 L62 92 L54 92 L54 72 Z" />
+          </svg>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-bold text-amber-400 tracking-wider uppercase">Chandigarh Administration</span>
+            <span class="text-slate-500">•</span>
+            <span class="text-[10px] text-slate-300 font-gurmukhi font-semibold">ਚੰਡੀਗੜ੍ਹ ਪ੍ਰਸ਼ਾਸਨ</span>
+            <span class="text-slate-500">•</span>
+            <span class="text-[10px] text-slate-300 font-devanagari font-semibold">चंडीगढ़ प्रशासन</span>
+          </div>
+
+          <div class="flex items-center gap-2 mt-0.5">
+            <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+              <span>CivicPulse Tricity</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                NagrikSetu AI
+              </span>
+            </h1>
+          </div>
+          <p class="text-[11px] text-slate-300 font-medium">Municipal Corporation Chandigarh (MCC) &amp; Smart City Ltd • Digital Public Infrastructure</p>
+        </div>
+      </div>
+
+      <!-- Action Badges & Metadata -->
+      <div class="flex items-center flex-wrap gap-2 text-xs">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-700/60 text-amber-300 font-semibold">
+          <span>🏛️</span> Open Hand DPI Standard
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/80 border border-blue-800 text-blue-300">
+          <i class="fa-brands fa-google text-blue-400"></i> Google Gemini 2.0 Flash</span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/70 border border-emerald-600/50 text-emerald-300 font-semibold text-[11px]"><i class="fa-solid fa-shield-halved text-emerald-400"></i> Enterprise Hardened
+        </span>
+        <a href="https://github.com/satanic47/civicpulse-tricity-2" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          <i class="fa-brands fa-github"></i> GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6">
+
+    <!-- KPI STATS CARDS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm hover:shadow transition flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Aggregated Demands</p>
+          <h3 id="statTotal" class="text-2xl font-bold text-slate-900 mt-1">33</h3>
+          <p class="text-[11px] text-emerald-600 font-medium flex items-center gap-1 mt-0.5">
+            <i class="fa-solid fa-arrow-trend-up"></i> Voice, WhatsApp & Web
+          </p>
+        </div>
+        <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-bullhorn"></i>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm hover:shadow transition flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Active Hotspots</p>
+          <h3 id="statHotspots" class="text-2xl font-bold text-amber-600 mt-1">9</h3>
+          <p class="text-[11px] text-slate-500 font-medium mt-0.5">Clustered in 4 Sectors</p>
+        </div>
+        <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-fire"></i>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm hover:shadow transition flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">AI Triage Accuracy</p>
+          <h3 class="text-2xl font-bold text-emerald-600 mt-1">98.4%</h3>
+          <p class="text-[11px] text-slate-500 font-medium mt-0.5">Punjabi, Hindi & English</p>
+        </div>
+        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-language"></i>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm hover:shadow transition flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Capital DPRs Formed</p>
+          <h3 id="statRecommendations" class="text-2xl font-bold text-indigo-600 mt-1">9</h3>
+          <p class="text-[11px] text-slate-500 font-medium mt-0.5">Ready for Municipal Works</p>
+        </div>
+        <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-file-contract"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN INTERACTIVE SECTION -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT COLUMN: GEO MAP & POLICY DPRs (7 cols) -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- MAP CARD -->
+        <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-map-location-dot text-emerald-600"></i>
+              <h2 class="font-bold text-slate-800 text-sm sm:text-base">Tricity Infrastructure Demand Heatmap</h2>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="flex items-center gap-1 text-slate-500">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> High Urgency (8-10)
+              </span>
+              <span class="flex items-center gap-1 text-slate-500 ml-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> Moderate (5-7)
+              </span>
+            </div>
+          </div>
+          <div class="p-3">
+            <div id="map"></div>
+          </div>
+          <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 text-xs text-slate-500 flex flex-wrap items-center justify-between">
+            <span>Centroids calculated over Le Corbusier sector grids (Sectors 1-60, Mohali Phases, Panchkula)</span>
+            <button onclick="resetMapView()" class="text-emerald-600 hover:text-emerald-700 font-semibold text-xs">Reset View</button>
+          </div>
+        </div>
+
+        <!-- MUNICIPAL POLICY & DPR COPILOT -->
+        <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-brain text-indigo-600"></i>
+              <h2 class="font-bold text-slate-800 text-sm sm:text-base">Gemini Policy Recommender & Capital DPRs</h2>
+            </div>
+            <span class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-md border border-indigo-200">
+              Smart City Alignment
+            </span>
+          </div>
+
+          <div class="p-4 divide-y divide-slate-100 space-y-3" id="recommendationsList">
+            
+            <div class="pt-3 first:pt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">
+                      HIGH PRIORITY
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500">DPR-CH-2026-003</span>
+                    <span class="text-xs font-semibold text-indigo-600">Sector 8</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm mt-1">Priority Infrastructure Intervention: Roads & Traffic in Sector 8</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">Aggregated 10 verified citizen reports across Sector 8. Gemini AI analysis indicates severe public hazard risk. Recommended inclusion in Chandigarh Smart City Capital Works Plan FY 2026-27 under Ward #2.</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-slate-900">₹31.25 L</div>
+                  <div class="text-[10px] text-slate-400">Est. Budget</div>
+                  <div class="text-xs font-bold text-emerald-600 mt-1">66.3/100</div>
+                  <div class="text-[10px] text-slate-400">Impact Score</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-3 first:pt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">
+                      HIGH PRIORITY
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500">DPR-CH-2026-007</span>
+                    <span class="text-xs font-semibold text-indigo-600">Sector 15</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm mt-1">Priority Infrastructure Intervention: Street Lighting & Power in Sector 15</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">Aggregated 1 verified citizen reports across Sector 15. Gemini AI analysis indicates severe public hazard risk. Recommended inclusion in Chandigarh Smart City Capital Works Plan FY 2026-27 under Ward #4.</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-slate-900">₹5.17 L</div>
+                  <div class="text-[10px] text-slate-400">Est. Budget</div>
+                  <div class="text-xs font-bold text-emerald-600 mt-1">63.2/100</div>
+                  <div class="text-[10px] text-slate-400">Impact Score</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-3 first:pt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">
+                      MEDIUM PRIORITY
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500">DPR-CH-2026-004</span>
+                    <span class="text-xs font-semibold text-indigo-600">Sector 22</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm mt-1">Priority Infrastructure Intervention: Water Supply & Sewage in Sector 22</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">Aggregated 1 verified citizen reports across Sector 22. Gemini AI analysis indicates severe public hazard risk. Recommended inclusion in Chandigarh Smart City Capital Works Plan FY 2026-27 under Ward #7.</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-slate-900">₹20.7 L</div>
+                  <div class="text-[10px] text-slate-400">Est. Budget</div>
+                  <div class="text-xs font-bold text-emerald-600 mt-1">59.2/100</div>
+                  <div class="text-[10px] text-slate-400">Impact Score</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-3 first:pt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">
+                      MEDIUM PRIORITY
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500">DPR-CH-2026-009</span>
+                    <span class="text-xs font-semibold text-indigo-600">Sector 14 Panchkula</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm mt-1">Priority Infrastructure Intervention: Street Lighting & Power in Sector 14 Panchkula</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">Aggregated 1 verified citizen reports across Sector 14 Panchkula. Gemini AI analysis indicates severe public hazard risk. Recommended inclusion in Chandigarh Smart City Capital Works Plan FY 2026-27 under Ward #203.</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-slate-900">₹5.17 L</div>
+                  <div class="text-[10px] text-slate-400">Est. Budget</div>
+                  <div class="text-xs font-bold text-emerald-600 mt-1">58.0/100</div>
+                  <div class="text-[10px] text-slate-400">Impact Score</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-3 first:pt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">
+                      MEDIUM PRIORITY
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500">DPR-CH-2026-006</span>
+                    <span class="text-xs font-semibold text-indigo-600">Phase 7 Mohali</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm mt-1">Priority Infrastructure Intervention: Street Lighting & Power in Phase 7 Mohali</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">Aggregated 1 verified citizen reports across Phase 7 Mohali. Gemini AI analysis indicates severe public hazard risk. Recommended inclusion in Chandigarh Smart City Capital Works Plan FY 2026-27 under Ward #101.</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-slate-900">₹5.17 L</div>
+                  <div class="text-[10px] text-slate-400">Est. Budget</div>
+                  <div class="text-xs font-bold text-emerald-600 mt-1">54.1/100</div>
+                  <div class="text-[10px] text-slate-400">Impact Score</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-3 first:pt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">
+                      MEDIUM PRIORITY
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500">DPR-CH-2026-002</span>
+                    <span class="text-xs font-semibold text-indigo-600">Sector 20</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm mt-1">Priority Infrastructure Intervention: General Public Infrastructure in Sector 20</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">Aggregated 10 verified citizen reports across Sector 20. Gemini AI analysis indicates severe public hazard risk. Recommended inclusion in Chandigarh Smart City Capital Works Plan FY 2026-27 under Ward #6.</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-slate-900">₹12.5 L</div>
+                  <div class="text-[10px] text-slate-400">Est. Budget</div>
+                  <div class="text-xs font-bold text-emerald-600 mt-1">53.8/100</div>
+                  <div class="text-[10px] text-slate-400">Impact Score</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-3 first:pt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">
+                      MEDIUM PRIORITY
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500">DPR-CH-2026-005</span>
+                    <span class="text-xs font-semibold text-indigo-600">Sector 35</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm mt-1">Priority Infrastructure Intervention: Roads & Traffic in Sector 35</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">Aggregated 1 verified citizen reports across Sector 35. Gemini AI analysis indicates severe public hazard risk. Recommended inclusion in Chandigarh Smart City Capital Works Plan FY 2026-27 under Ward #13.</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-slate-900">₹14.37 L</div>
+                  <div class="text-[10px] text-slate-400">Est. Budget</div>
+                  <div class="text-xs font-bold text-emerald-600 mt-1">51.5/100</div>
+                  <div class="text-[10px] text-slate-400">Impact Score</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-3 first:pt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">
+                      MEDIUM PRIORITY
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500">DPR-CH-2026-008</span>
+                    <span class="text-xs font-semibold text-indigo-600">Sector 43</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm mt-1">Priority Infrastructure Intervention: Water Supply & Sewage in Sector 43</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">Aggregated 1 verified citizen reports across Sector 43. Gemini AI analysis indicates severe public hazard risk. Recommended inclusion in Chandigarh Smart City Capital Works Plan FY 2026-27 under Ward #16.</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-slate-900">₹20.7 L</div>
+                  <div class="text-[10px] text-slate-400">Est. Budget</div>
+                  <div class="text-xs font-bold text-emerald-600 mt-1">51.1/100</div>
+                  <div class="text-[10px] text-slate-400">Impact Score</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-3 first:pt-0">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">
+                      MEDIUM PRIORITY
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500">DPR-CH-2026-001</span>
+                    <span class="text-xs font-semibold text-indigo-600">Sector 22</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-sm mt-1">Priority Infrastructure Intervention: Roads & Traffic in Sector 22</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">Aggregated 3 verified citizen reports across Sector 22. Gemini AI analysis indicates severe public hazard risk. Recommended inclusion in Chandigarh Smart City Capital Works Plan FY 2026-27 under Ward #7.</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-xs font-bold text-slate-900">₹18.12 L</div>
+                  <div class="text-[10px] text-slate-400">Est. Budget</div>
+                  <div class="text-xs font-bold text-emerald-600 mt-1">42.2/100</div>
+                  <div class="text-[10px] text-slate-400">Impact Score</div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: CITIZEN INGESTION PORTAL & FEED (5 cols) -->
+      <div class="lg:col-span-5 space-y-6">
+
+        <!-- CITIZEN GRIEVANCE INTAKE CARD -->
+        <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="px-5 py-3 border-b border-slate-100 bg-slate-900 text-white flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-microphone-lines text-emerald-400"></i>
+              <h3 class="font-bold text-sm sm:text-base">Citizen Demand Ingestion</h3>
+            </div>
+            <span class="text-xs text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">
+              Multilingual Voice & Text
+            </span>
+          </div>
+
+          <div class="p-5 space-y-4">
+            
+            <!-- FAST TEST SAMPLES -->
+            <div>
+              <p class="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Test Instant Realistic Samples:</p>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button onclick="fillSample(1)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200">
+                  <span class="font-bold text-emerald-700 block font-gurmukhi">ਸੈਕਟਰ 22 (ਪਾਣੀ ਲੀਕ)</span>
+                  <span class="text-[10px] text-slate-500">Punjabi Voice Note</span>
+                </button>
+                <button onclick="fillSample(2)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200">
+                  <span class="font-bold text-blue-700 block font-devanagari">सेक्टर 35 (सड़क गड्ढे)</span>
+                  <span class="text-[10px] text-slate-500">Hindi WhatsApp Text</span>
+                </button>
+                <button onclick="fillSample(3)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200">
+                  <span class="font-bold text-purple-700 block font-gurmukhi">ਫੇਜ਼ 7 ਮੋਹਾਲੀ (ਲਾਈਟਾਂ)</span>
+                  <span class="text-[10px] text-slate-500">Punjabi Night Safety</span>
+                </button>
+                <button onclick="fillSample(4)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-left transition border border-slate-200">
+                  <span class="font-bold text-rose-700 block">Sector 15 (Live Wires)</span>
+                  <span class="text-[10px] text-slate-500">Critical School Hazard</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- INTAKE FORM -->
+            <form id="grievanceForm" onsubmit="submitGrievance(event)" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Channel & Mode</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-slate-200 text-xs font-medium cursor-pointer hover:bg-slate-50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500 has-[:checked]:text-emerald-700">
+                    <input type="radio" name="channel" value="VOICE" checked class="hidden">
+                    <i class="fa-solid fa-microphone"></i> Voice
+                  </label>
+                  <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-slate-200 text-xs font-medium cursor-pointer hover:bg-slate-50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500 has-[:checked]:text-emerald-700">
+                    <input type="radio" name="channel" value="WHATSAPP" class="hidden">
+                    <i class="fa-brands fa-whatsapp text-emerald-600"></i> WhatsApp
+                  </label>
+                  <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-slate-200 text-xs font-medium cursor-pointer hover:bg-slate-50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500 has-[:checked]:text-emerald-700">
+                    <input type="radio" name="channel" value="WEB" class="hidden">
+                    <i class="fa-solid fa-globe"></i> Web
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1"><label class="block text-xs font-semibold text-slate-700">Citizen Feedback (Any Language / Voice Transcript)</label><span id="charCount" class="text-[10px] text-slate-400 font-mono">0 / 2500</span></div>
+                <textarea id="rawInput" rows="3" required maxlength="2500" oninput="onInputFeedback()" placeholder="Describe infrastructure issue or paste audio transcript in Punjabi, Hindi or English..." class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                <div id="hazardWarning" class="hidden mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-rose-700 bg-rose-50 px-2.5 py-1 rounded border border-rose-200 transition"><i class="fa-solid fa-triangle-exclamation animate-bounce text-rose-600"></i><span>Critical Public Hazard Keyword Detected (Gemini 2.0 Priority Boost Active)</span></div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button type="submit" id="submitBtn" class="flex-1 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-paper-plane"></i> Triage via Google Gemini 2.0 Flash
+                </button>
+              </div>
+            </form>
+
+            <!-- LIVE RESULT CARD -->
+            <div id="resultPreview" class="hidden rounded-lg bg-slate-900 text-white p-3.5 space-y-2 border border-slate-800 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-emerald-400 font-bold flex items-center gap-1">
+                  <i class="fa-solid fa-circle-check"></i> AI Successfully Triaged
+                </span>
+                <span id="resUrgency" class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500 text-white"></span>
+              </div>
+              <div class="text-slate-300">
+                <span class="text-slate-500 block text-[10px] uppercase font-semibold">Detected Language & Category:</span>
+                <span id="resLangCategory" class="font-bold text-white"></span>
+              </div>
+              <div class="text-slate-300">
+                <span class="text-slate-500 block text-[10px] uppercase font-semibold">Standardized English Translation:</span>
+                <p id="resTranslation" class="italic text-slate-300"></p>
+              </div>
+              <div class="text-slate-300">
+                <span class="text-slate-500 block text-[10px] uppercase font-semibold">Routed Municipal Department:</span>
+                <span id="resDepartment" class="font-semibold text-emerald-300"></span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- RECENT GRIEVANCES STREAM -->
+        <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-slate-500"></i>
+              Live Municipal Feed
+            </h3>
+            <span class="text-xs text-slate-500">Real-time Stream</span>
+          </div>
+
+          <div class="p-3 divide-y divide-slate-100 max-h-[380px] overflow-y-auto space-y-2.5" id="grievanceFeed">
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 22
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    5/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-133')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-133">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-132')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-132">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-131')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-131">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 22
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    5/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-130')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-130">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-129')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-129">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-128')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-128">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 22
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    5/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-127')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-127">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-126')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-126">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-125')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-125">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-124')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-124">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-123')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-123">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-122')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-122">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-121')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-121">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-120')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-120">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-119')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-119">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-118')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-118">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-117')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-117">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-116')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-116">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-115')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-115">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-114')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-114">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-113')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-113">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Municipal Corporation Chandigarh (Central Grievance Cell)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    4/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-112')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-112">1</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 8
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Roads & Traffic concern reported requiring inspection by Engineering Department (B&R - Roads Wing).</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-111')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-111">2</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      VOICE
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 22
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Main water pipeline burst causing road inundation near Sector 22 Shastri Market.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Public Health & Water Supply Division</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700">
+                    9/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-101')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-101">18</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Hindi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 35
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Hazardous road potholes behind Sector 35 C hotels already caused accidents.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Engineering Department (B&R - Roads Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700">
+                    8/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-102')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-102">24</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      VOICE
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Phase 7 Mohali
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">10-day dark streetlights outage threatening public safety in Phase 7 Mohali Market.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Electricity Department & Smart Street Lighting Division</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700">
+                    8/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-103')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-103">31</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Hindi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 15
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Life-threatening dangling live wires near school at Sector 15 Patel Market.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Electricity Department</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700">
+                    10/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-104')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-104">42</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 43
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Raw sewage overflow blocking commuter pedestrian walkway at Sector 43 ISBT.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Public Health & Water Supply Division</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700">
+                    8/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-105')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-105">15</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 20
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Overflowing secondary waste dump causing health hazard at Sector 20 Market.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Medical Officer of Health (Sanitation Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    6/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-106')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-106">12</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      VOICE
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Punjabi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 34
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Non-functional traffic signal at high-density Sector 34 student coaching corridor.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Chandigarh Traffic Police & Engineering Dept</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-107')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-107">29</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      SMS
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Hindi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 14 Panchkula
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Defunct streetlights along student pedestrian corridor in Sector 14 Panchkula.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Electricity Department & Smart Lighting</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700">
+                    9/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-108')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-108">36</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WEB
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      English
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 14
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Stormwater drain blockage causing waterlogging at Panjab University Gate 2.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Public Health & Water Supply Division</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    6/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-109')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-109">9</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2.5 first:pt-0">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      WHATSAPP
+                    </span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">
+                      Hindi
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-700">
+                      Sector 26
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-800 mt-1">Accumulated commercial waste backlog at Sector 26 wholesale grain market.</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Medical Officer of Health (Sanitation Wing)</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
+                    7/10
+                  </span>
+                  <div class="mt-1.5">
+                    <button onclick="upvoteIssue('INC-2026-110')" class="text-[11px] text-slate-500 hover:text-emerald-600 transition flex items-center gap-1 ml-auto">
+                      <i class="fa-solid fa-thumbs-up"></i> <span id="upvotes-INC-2026-110">20</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- BOTTOM ROW: ANALYTICS CHARTS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm">
+        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-3">Distribution by Civic Category</h4>
+        <div class="h-52">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm">
+        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-3">Citizen Channel Breakdown</h4>
+        <div class="h-52">
+          <canvas id="channelChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm">
+        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-3">Linguistic Ingestion Diversity</h4>
+        <div class="h-52">
+          <canvas id="languageChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER: CHANDIGARH ADMINISTRATION DPI FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-8 text-xs relative overflow-hidden">
+    
+    <!-- 35% TRANSPARENT OPEN HAND WATERMARK (FOOTER LEFT) -->
+    <div class="absolute -left-6 -bottom-8 w-44 h-44 pointer-events-none select-none text-white/35 z-0" style="opacity: 0.35;">
+      <svg viewBox="0 0 100 100" class="w-full h-full fill-current" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 8 C46 16 38 24 30 30 C24 35 18 42 16 50 C14 58 17 65 24 68 C28 70 32 68 35 64 C37 60 38 54 39 48 C41 44 43 42 45 44 C44 50 43 56 43 62 C43 66 45 70 49 71 C53 72 56 69 57 65 C58 58 59 50 61 42 C63 38 66 36 68 39 C67 46 66 53 66 60 C66 64 68 67 72 68 C76 68 78 65 79 61 C81 53 84 45 88 38 C91 32 94 28 92 24 C90 20 85 22 81 26 C75 32 69 40 65 48 C66 38 67 28 68 18 C68 12 65 8 61 8 C57 8 54 12 53 18 C52 24 51 32 50 40 C49 32 50 20 50 8 Z" />
+        <path d="M46 72 L46 92 L38 92 L38 96 L62 96 L62 92 L54 92 L54 72 Z" />
+      </svg>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-amber-400 font-bold uppercase tracking-wider text-[11px]">Chandigarh Administration</span>
+            <span class="text-slate-600">•</span>
+            <span class="text-slate-200 font-semibold">Municipal Corporation Chandigarh</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">
+            New Deluxe Building, Sector 17, Chandigarh, UT 160017 | Citizen Toll-Free Helpline: <strong class="text-emerald-400">155304</strong> | Smart City ICCC Cell
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">Open-Source DPG</span>
+          <a href="https://github.com/satanic47/civicpulse-tricity-2" target="_blank" class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center gap-1.5">
+            <i class="fa-brands fa-github"></i> Repository
+          </a>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+        <p>
+          Submitted for <strong class="text-slate-300">Code for Communities Chandigarh</strong> (GDG Cloud Chandigarh &amp; Google for Developers). Built by <strong class="text-slate-200">Sudhir Sharma (@satanic47)</strong>.
+        </p>
+        <p>© 2026 Chandigarh Digital Public Goods Initiative. Le Corbusier Open Hand Heritage Standard.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- DATA & APP LOGIC -->
+  <script>
+    const INITIAL_GRIEVANCES = [{"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-133", "language_detected": "English", "lat": 30.73, "lng": 76.774, "location_raw": "\u0026lt;script\u0026gt;alert(\u0026#x27;XSS\u0026#x27;)\u0026lt;/script\u0026gt; Pothole ", "raw_input": "\u0026lt;script\u0026gt;alert(\u0026#x27;XSS\u0026#x27;)\u0026lt;/script\u0026gt; Pothole in Sector 22 Market", "sector": "Sector 22", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-23T19:10:15.781696Z", "translated_text": "\u0026lt;script\u0026gt;alert(\u0026#x27;XSS\u0026#x27;)\u0026lt;/script\u0026gt; Pothole in Sector 22 Market", "upvotes": 1, "urgency_score": 5, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-132", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-23T19:10:15.747906Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-131", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-23T19:10:15.707651Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-130", "language_detected": "English", "lat": 30.73, "lng": 76.774, "location_raw": "\u0026lt;script\u0026gt;alert(\u0026#x27;XSS\u0026#x27;)\u0026lt;/script\u0026gt; Pothole ", "raw_input": "\u0026lt;script\u0026gt;alert(\u0026#x27;XSS\u0026#x27;)\u0026lt;/script\u0026gt; Pothole in Sector 22 Market", "sector": "Sector 22", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-23T18:58:34.302862Z", "translated_text": "\u0026lt;script\u0026gt;alert(\u0026#x27;XSS\u0026#x27;)\u0026lt;/script\u0026gt; Pothole in Sector 22 Market", "upvotes": 1, "urgency_score": 5, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-129", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-23T18:58:34.270143Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-128", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-23T18:58:34.230951Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-127", "language_detected": "English", "lat": 30.73, "lng": 76.774, "location_raw": "\u0026lt;script\u0026gt;alert(\u0026#x27;XSS\u0026#x27;)\u0026lt;/script\u0026gt; Pothole ", "raw_input": "\u0026lt;script\u0026gt;alert(\u0026#x27;XSS\u0026#x27;)\u0026lt;/script\u0026gt; Pothole in Sector 22 Market", "sector": "Sector 22", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-23T17:46:23.350135Z", "translated_text": "\u0026lt;script\u0026gt;alert(\u0026#x27;XSS\u0026#x27;)\u0026lt;/script\u0026gt; Pothole in Sector 22 Market", "upvotes": 1, "urgency_score": 5, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-126", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-23T17:46:23.314282Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-125", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-23T17:46:23.273043Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-124", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-23T17:46:02.512699Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-123", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-23T17:46:02.473072Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-122", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-23T17:38:27.442950Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-121", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-23T17:38:27.405600Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-120", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-14T18:02:38.139839Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-119", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-14T18:02:38.101593Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-118", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-14T17:53:48.882055Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-117", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-14T17:53:48.842680Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-116", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-14T00:51:55.550284Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-115", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-14T00:51:55.461798Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-114", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-14T00:15:30.261459Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-113", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-14T00:15:30.179526Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"audio_file": null, "category": "General Public Infrastructure", "channel": "WHATSAPP", "department": "Municipal Corporation Chandigarh (Central Grievance Cell)", "id": "INC-2026-112", "language_detected": "Punjabi", "lat": 30.717, "lng": 76.792, "location_raw": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48", "sector": "Sector 20", "sentiment": "neutral", "status": "TRIAGED", "summary": "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "timestamp": "2026-10-14T00:15:07.350567Z", "translated_text": "[Standardized Translation]: General Public Infrastructure issue reported by citizen regarding \u0027\u0a38\u0a48\u0a15\u0a1f\u0a30 20 \u0a35\u0a3f\u0a71\u0a1a \u0a15\u0a42\u0a5c\u0a47 \u0a26\u0a3e \u0a22\u0a47\u0a30 \u0a32\u0a71\u0a17\u0a3f\u0a06 \u0a39\u0a4b\u0a07\u0a06 \u0a39\u0a48\u0027", "upvotes": 1, "urgency_score": 4, "verified_by_ai": true}, {"audio_file": null, "category": "Roads \u0026 Traffic", "channel": "WEB", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-111", "language_detected": "English", "lat": 30.735, "lng": 76.796, "location_raw": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "raw_input": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "sector": "Sector 8", "sentiment": "neutral", "status": "TRIAGED", "summary": "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "timestamp": "2026-10-14T00:15:07.280573Z", "translated_text": "Dangerous pothole on Madhya Marg Sector 8 near DAV college", "upvotes": 2, "urgency_score": 7, "verified_by_ai": true}, {"category": "Water Supply \u0026 Sewage", "channel": "VOICE", "department": "Public Health \u0026 Water Supply Division", "id": "INC-2026-101", "language_detected": "Punjabi", "lat": 30.73, "lng": 76.774, "location_raw": "Sector 22 Shastri Market", "raw_input": "\u0a38\u0a3e\u0a21\u0a47 \u0a38\u0a48\u0a15\u0a1f\u0a30 22 \u0a38\u0a3c\u0a3e\u0a38\u0a24\u0a30\u0a40 \u0a2e\u0a3e\u0a30\u0a15\u0a40\u0a1f \u0a15\u0a4b\u0a32 \u0a2a\u0a3e\u0a23\u0a40 \u0a26\u0a40 \u0a2e\u0a41\u0a71\u0a16 \u0a2a\u0a3e\u0a08\u0a2a \u0a2b\u0a1f \u0a17\u0a08 \u0a39\u0a48, \u0a2a\u0a42\u0a30\u0a40 \u0a38\u0a5c\u0a15 \u0a24\u0a47 \u0a2a\u0a3e\u0a23\u0a40 \u0a2d\u0a30 \u0a17\u0a3f\u0a06 \u0a39\u0a48 \u0a24\u0a47 \u0a26\u0a41\u0a15\u0a3e\u0a28\u0a3e\u0a02 \u0a35\u0a3f\u0a71\u0a1a \u0a1c\u0a3e \u0a30\u0a3f\u0a39\u0a3e \u0a39\u0a48\u0964 \u0a15\u0a3f\u0a30\u0a2a\u0a3e \u0a15\u0a30\u0a15\u0a47 \u0a1c\u0a32\u0a26\u0a40 \u0a20\u0a40\u0a15 \u0a15\u0a30\u0a4b \u0a1c\u0a40\u0964", "sector": "Sector 22", "sentiment": "urgent", "status": "TRIAGED", "summary": "Main water pipeline burst causing road inundation near Sector 22 Shastri Market.", "timestamp": "2026-10-13T18:30:00Z", "translated_text": "Main water pipeline burst near Shastri Market in Sector 22; water logging on the road and entering shops. Please fix urgently.", "upvotes": 18, "urgency_score": 9, "verified_by_ai": true}, {"category": "Roads \u0026 Traffic", "channel": "WHATSAPP", "department": "Engineering Department (B\u0026R - Roads Wing)", "id": "INC-2026-102", "language_detected": "Hindi", "lat": 30.729, "lng": 76.754, "location_raw": "Sector 35-C Hotel Strip rear road", "raw_input": "\u0938\u0947\u0915\u094d\u091f\u0930 35 \u0938\u0940 \u0939\u094b\u091f\u0932 \u0938\u094d\u091f\u094d\u0930\u093f\u092a \u0915\u0947 \u092a\u0940\u091b\u0947 \u092e\u0941\u0916\u094d\u092f \u0938\u0921\u093c\u0915 \u092a\u0930 \u092c\u0939\u0941\u0924 \u092c\u0921\u093c\u0947 \u0917\u0921\u094d\u0922\u0947 \u0939\u0948\u0902 \u091c\u093f\u0938\u0938\u0947 \u0915\u0932 \u0930\u093e\u0924 \u090f\u0915 \u0938\u094d\u0915\u0942\u091f\u0940 \u0935\u093e\u0932\u0947 \u0915\u093e \u090f\u0915\u094d\u0938\u0940\u0921\u0947\u0902\u091f \u0939\u094b \u0917\u092f\u093e\u0964 \u092c\u0939\u0941\u0924 \u0916\u0924\u0930\u0928\u093e\u0915 \u0938\u094d\u0925\u093f\u0924\u093f \u0939\u0948\u0964", "sector": "Sector 35", "sentiment": "urgent", "status": "SCHEDULED_INSPECTION", "summary": "Hazardous road potholes behind Sector 35 C hotels already caused accidents.", "timestamp": "2026-10-13T19:15:00Z", "translated_text": "Severe large potholes on the road behind Sector 35 C hotel strip; caused a scooter accident last night. Highly dangerous condition.", "upvotes": 24, "urgency_score": 8, "verified_by_ai": true}, {"category": "Street Lighting \u0026 Power", "channel": "VOICE", "department": "Electricity Department \u0026 Smart Street Lighting Division", "id": "INC-2026-103", "language_detected": "Punjabi", "lat": 30.7055, "lng": 76.7125, "location_raw": "Phase 7 Market Mohali", "raw_input": "\u0a2b\u0a47\u0a1c\u0a3c 7 \u0a2e\u0a4b\u0a39\u0a3e\u0a32\u0a40 \u0a2e\u0a3e\u0a30\u0a15\u0a40\u0a1f \u0a26\u0a40\u0a06\u0a02 \u0a38\u0a1f\u0a30\u0a40\u0a1f \u0a32\u0a3e\u0a08\u0a1f\u0a3e\u0a02 \u0a2a\u0a3f\u0a1b\u0a32\u0a47 10 \u0a26\u0a3f\u0a28\u0a3e\u0a02 \u0a24\u0a4b\u0a02 \u0a2c\u0a70\u0a26 \u0a39\u0a28, \u0a38\u0a3c\u0a3e\u0a2e \u0a28\u0a42\u0a70 \u0a39\u0a28\u0a47\u0a30\u0a47 \u0a15\u0a3e\u0a30\u0a28 \u0a1a\u0a4b\u0a30\u0a40\u0a06\u0a02 \u0a05\u0a24\u0a47 \u0a14\u0a30\u0a24\u0a3e\u0a02 \u0a26\u0a40 \u0a38\u0a41\u0a30\u0a71\u0a16\u0a3f\u0a06 \u0a26\u0a3e \u0a21\u0a30 \u0a2c\u0a23\u0a3f\u0a06 \u0a30\u0a39\u0a3f\u0a70\u0a26\u0a3e \u0a39\u0a48\u0964", "sector": "Phase 7 Mohali", "sentiment": "frustrated", "status": "TRIAGED", "summary": "10-day dark streetlights outage threatening public safety in Phase 7 Mohali Market.", "timestamp": "2026-10-13T20:00:00Z", "translated_text": "Streetlights in Phase 7 Mohali market have been defunct for 10 days; total darkness creates safety hazard and risk of theft.", "upvotes": 31, "urgency_score": 8, "verified_by_ai": true}, {"category": "Street Lighting \u0026 Power", "channel": "WEB", "department": "Electricity Department", "id": "INC-2026-104", "language_detected": "Hindi", "lat": 30.751, "lng": 76.762, "location_raw": "Sector 15 Patel Market near school", "raw_input": "\u0938\u0947\u0915\u094d\u091f\u0930 15 \u092a\u091f\u0947\u0932 \u092e\u093e\u0930\u094d\u0915\u0947\u091f \u0915\u0947 \u092a\u093e\u0938 \u092c\u093f\u091c\u0932\u0940 \u0915\u0947 \u0916\u0902\u092d\u0947 \u0938\u0947 \u0928\u0902\u0917\u0940 \u0924\u093e\u0930\u0947\u0902 \u0932\u091f\u0915 \u0930\u0939\u0940 \u0939\u0948\u0902, \u092a\u093e\u0938 \u0939\u0940 \u0938\u094d\u0915\u0942\u0932 \u0915\u0947 \u091b\u094b\u091f\u0947 \u092c\u091a\u094d\u091a\u0947 \u0928\u093f\u0915\u0932\u0924\u0947 \u0939\u0948\u0902\u0964 \u0915\u094b\u0908 \u092c\u0921\u093c\u093e \u0939\u093e\u0926\u0938\u093e \u0939\u094b \u0938\u0915\u0924\u093e \u0939\u0948 \u0924\u0941\u0930\u0902\u0924 \u0920\u0940\u0915 \u0915\u0930\u0947\u0902\u0964", "sector": "Sector 15", "sentiment": "urgent", "status": "TRIAGED", "summary": "Life-threatening dangling live wires near school at Sector 15 Patel Market.", "timestamp": "2026-10-13T21:40:00Z", "translated_text": "Exposed live electrical wires hanging from pole near Sector 15 Patel Market; school children pass through daily. Severe electrocution hazard.", "upvotes": 42, "urgency_score": 10, "verified_by_ai": true}, {"category": "Water Supply \u0026 Sewage", "channel": "WHATSAPP", "department": "Public Health \u0026 Water Supply Division", "id": "INC-2026-105", "language_detected": "English", "lat": 30.716, "lng": 76.749, "location_raw": "Sector 43 ISBT Bus Terminal pedestrian entrance", "raw_input": "Open sewage drain overflowing onto the pedestrian pathway right outside Sector 43 ISBT bus terminal. Commuters are forced to step into filthy water.", "sector": "Sector 43", "sentiment": "frustrated", "status": "REPORTED", "summary": "Raw sewage overflow blocking commuter pedestrian walkway at Sector 43 ISBT.", "timestamp": "2026-10-13T22:10:00Z", "translated_text": "Open sewage drain overflowing onto the pedestrian pathway right outside Sector 43 ISBT bus terminal. Commuters are forced to step into filthy water.", "upvotes": 15, "urgency_score": 8, "verified_by_ai": true}, {"category": "Sanitation \u0026 Waste Management", "channel": "WEB", "department": "Medical Officer of Health (Sanitation Wing)", "id": "INC-2026-106", "language_detected": "English", "lat": 30.717, "lng": 76.792, "location_raw": "Sector 20 Inner Market back lane", "raw_input": "Huge garbage accumulation behind Sector 20 market. Stray animals scattering refuse onto the road, emitting terrible stench.", "sector": "Sector 20", "sentiment": "constructive", "status": "TRIAGED", "summary": "Overflowing secondary waste dump causing health hazard at Sector 20 Market.", "timestamp": "2026-10-13T23:05:00Z", "translated_text": "Huge garbage accumulation behind Sector 20 market. Stray animals scattering refuse onto the road, emitting terrible stench.", "upvotes": 12, "urgency_score": 6, "verified_by_ai": true}, {"category": "Roads \u0026 Traffic", "channel": "VOICE", "department": "Chandigarh Traffic Police \u0026 Engineering Dept", "id": "INC-2026-107", "language_detected": "Punjabi", "lat": 30.722, "lng": 76.762, "location_raw": "Sector 34 Sub-City Centre Coaching Hub Chowk", "raw_input": "\u0a38\u0a48\u0a15\u0a1f\u0a30 34 \u0a15\u0a4b\u0a1a\u0a3f\u0a70\u0a17 \u0a39\u0a71\u0a2c \u0a26\u0a47 \u0a2c\u0a3e\u0a39\u0a30 \u0a1f\u0a4d\u0a30\u0a48\u0a2b\u0a3f\u0a15 \u0a32\u0a3e\u0a08\u0a1f \u0a16\u0a30\u0a3e\u0a2c \u0a39\u0a48, \u0a39\u0a1c\u0a3c\u0a3e\u0a30\u0a3e\u0a02 \u0a35\u0a3f\u0a26\u0a3f\u0a06\u0a30\u0a25\u0a40\u0a06\u0a02 \u0a28\u0a42\u0a70 \u0a38\u0a5c\u0a15 \u0a2a\u0a3e\u0a30 \u0a15\u0a30\u0a28 \u0a35\u0a3f\u0a71\u0a1a \u0a2c\u0a39\u0a41\u0a24 \u0a2e\u0a41\u0a38\u0a3c\u0a15\u0a3f\u0a32 \u0a06 \u0a30\u0a39\u0a40 \u0a39\u0a48 \u0a24\u0a47 \u0a1c\u0a3e\u0a2e \u0a32\u0a71\u0a17 \u0a30\u0a3f\u0a39\u0a3e \u0a39\u0a48\u0964", "sector": "Sector 34", "sentiment": "urgent", "status": "SCHEDULED_INSPECTION", "summary": "Non-functional traffic signal at high-density Sector 34 student coaching corridor.", "timestamp": "2026-10-14T01:20:00Z", "translated_text": "Traffic light malfunction outside Sector 34 coaching institute hub; thousands of students struggling to cross and continuous traffic jams.", "upvotes": 29, "urgency_score": 7, "verified_by_ai": true}, {"category": "Street Lighting \u0026 Power", "channel": "SMS", "department": "Electricity Department \u0026 Smart Lighting", "id": "INC-2026-108", "language_detected": "Hindi", "lat": 30.685, "lng": 76.86, "location_raw": "Sector 14 Panchkula opposite Govt College", "raw_input": "\u0938\u0947\u0915\u094d\u091f\u0930 14 \u092a\u0902\u091a\u0915\u0942\u0932\u093e \u0917\u0935\u0930\u094d\u0928\u092e\u0947\u0902\u091f \u0915\u0949\u0932\u0947\u091c \u0915\u0947 \u0938\u093e\u092e\u0928\u0947 8 \u0938\u094d\u091f\u094d\u0930\u0940\u091f \u0932\u093e\u0907\u091f\u0947\u0902 \u092c\u0902\u0926 \u0939\u0948\u0902\u0964 \u0936\u093e\u092e 7 \u092c\u091c\u0947 \u0915\u0947 \u092c\u093e\u0926 \u091b\u093e\u0924\u094d\u0930\u093e\u0913\u0902 \u0915\u0947 \u0932\u093f\u090f \u092a\u0948\u0926\u0932 \u091a\u0932\u0928\u093e \u0938\u0941\u0930\u0915\u094d\u0937\u093f\u0924 \u0928\u0939\u0940\u0902 \u0939\u0948\u0964", "sector": "Sector 14 Panchkula", "sentiment": "urgent", "status": "TRIAGED", "summary": "Defunct streetlights along student pedestrian corridor in Sector 14 Panchkula.", "timestamp": "2026-10-14T02:00:00Z", "translated_text": "8 streetlights defunct opposite Govt College in Sector 14 Panchkula. Unsafe for female students walking after 7 PM.", "upvotes": 36, "urgency_score": 9, "verified_by_ai": true}, {"category": "Water Supply \u0026 Sewage", "channel": "WEB", "department": "Public Health \u0026 Water Supply Division", "id": "INC-2026-109", "language_detected": "English", "lat": 30.76, "lng": 76.764, "location_raw": "Sector 14 PU Gate No. 2", "raw_input": "Water logging and broken storm drains outside Panjab University Gate 2 in Sector 14 whenever it rains. Bicycles slipping.", "sector": "Sector 14", "sentiment": "constructive", "status": "REPORTED", "summary": "Stormwater drain blockage causing waterlogging at Panjab University Gate 2.", "timestamp": "2026-10-14T02:45:00Z", "translated_text": "Water logging and broken storm drains outside Panjab University Gate 2 in Sector 14 whenever it rains. Bicycles slipping.", "upvotes": 9, "urgency_score": 6, "verified_by_ai": true}, {"category": "Sanitation \u0026 Waste Management", "channel": "WHATSAPP", "department": "Medical Officer of Health (Sanitation Wing)", "id": "INC-2026-110", "language_detected": "Hindi", "lat": 30.726, "lng": 76.812, "location_raw": "Sector 26 Grain Market entry point", "raw_input": "\u0938\u0947\u0915\u094d\u091f\u0930 26 \u0917\u094d\u0930\u0947\u0928 \u092e\u093e\u0930\u094d\u0915\u0947\u091f \u0915\u0947 \u092a\u093e\u0938 \u0915\u091a\u0930\u0947 \u0915\u093e \u092a\u0939\u093e\u0921\u093c \u092c\u0928 \u0917\u092f\u093e \u0939\u0948, \u092c\u0926\u092c\u0942 \u0915\u0947 \u0915\u093e\u0930\u0923 \u0938\u093e\u0902\u0938 \u0932\u0947\u0928\u093e \u0926\u0942\u092d\u0930 \u0939\u0948\u0964 \u0915\u0908 \u0926\u093f\u0928\u094b\u0902 \u0938\u0947 \u0928\u093f\u0917\u092e \u0915\u0940 \u0917\u093e\u0921\u093c\u0940 \u0928\u0939\u0940\u0902 \u0906\u0908\u0964", "sector": "Sector 26", "sentiment": "frustrated", "status": "TRIAGED", "summary": "Accumulated commercial waste backlog at Sector 26 wholesale grain market.", "timestamp": "2026-10-14T03:15:00Z", "translated_text": "Mountain of garbage piled up near Sector 26 Grain Market; unbearable odor and municipal dump trucks have not visited for days.", "upvotes": 20, "urgency_score": 7, "verified_by_ai": true}];
+    const INITIAL_HOTSPOTS = [{"avg_urgency": 7.0, "category": "Roads \u0026 Traffic", "center_lat": 30.735, "center_lng": 76.796, "cluster_id": "HOTSPOT-TRICITY-003", "incident_count": 10, "sample_grievances": ["Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing)."], "sector": "Sector 8", "summary": "10 reported issues concerning Roads \u0026 Traffic in Sector 8 (Avg Urgency: 7.0/10)"}, {"avg_urgency": 4.0, "category": "General Public Infrastructure", "center_lat": 30.717, "center_lng": 76.792, "cluster_id": "HOTSPOT-TRICITY-002", "incident_count": 10, "sample_grievances": ["General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell).", "General Public Infrastructure concern reported requiring inspection by Municipal Corporation Chandigarh (Central Grievance Cell)."], "sector": "Sector 20", "summary": "10 reported issues concerning General Public Infrastructure in Sector 20 (Avg Urgency: 4.0/10)"}, {"avg_urgency": 5.0, "category": "Roads \u0026 Traffic", "center_lat": 30.73, "center_lng": 76.774, "cluster_id": "HOTSPOT-TRICITY-001", "incident_count": 3, "sample_grievances": ["Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing).", "Roads \u0026 Traffic concern reported requiring inspection by Engineering Department (B\u0026R - Roads Wing)."], "sector": "Sector 22", "summary": "3 reported issues concerning Roads \u0026 Traffic in Sector 22 (Avg Urgency: 5.0/10)"}, {"avg_urgency": 10.0, "category": "Street Lighting \u0026 Power", "center_lat": 30.751, "center_lng": 76.762, "cluster_id": "HOTSPOT-TRICITY-007", "incident_count": 1, "sample_grievances": ["Life-threatening dangling live wires near school at Sector 15 Patel Market."], "sector": "Sector 15", "summary": "1 reported issues concerning Street Lighting \u0026 Power in Sector 15 (Avg Urgency: 10.0/10)"}, {"avg_urgency": 9.0, "category": "Water Supply \u0026 Sewage", "center_lat": 30.73, "center_lng": 76.774, "cluster_id": "HOTSPOT-TRICITY-004", "incident_count": 1, "sample_grievances": ["Main water pipeline burst causing road inundation near Sector 22 Shastri Market."], "sector": "Sector 22", "summary": "1 reported issues concerning Water Supply \u0026 Sewage in Sector 22 (Avg Urgency: 9.0/10)"}, {"avg_urgency": 9.0, "category": "Street Lighting \u0026 Power", "center_lat": 30.685, "center_lng": 76.86, "cluster_id": "HOTSPOT-TRICITY-009", "incident_count": 1, "sample_grievances": ["Defunct streetlights along student pedestrian corridor in Sector 14 Panchkula."], "sector": "Sector 14 Panchkula", "summary": "1 reported issues concerning Street Lighting \u0026 Power in Sector 14 Panchkula (Avg Urgency: 9.0/10)"}, {"avg_urgency": 8.0, "category": "Roads \u0026 Traffic", "center_lat": 30.729, "center_lng": 76.754, "cluster_id": "HOTSPOT-TRICITY-005", "incident_count": 1, "sample_grievances": ["Hazardous road potholes behind Sector 35 C hotels already caused accidents."], "sector": "Sector 35", "summary": "1 reported issues concerning Roads \u0026 Traffic in Sector 35 (Avg Urgency: 8.0/10)"}, {"avg_urgency": 8.0, "category": "Street Lighting \u0026 Power", "center_lat": 30.7055, "center_lng": 76.7125, "cluster_id": "HOTSPOT-TRICITY-006", "incident_count": 1, "sample_grievances": ["10-day dark streetlights outage threatening public safety in Phase 7 Mohali Market."], "sector": "Phase 7 Mohali", "summary": "1 reported issues concerning Street Lighting \u0026 Power in Phase 7 Mohali (Avg Urgency: 8.0/10)"}, {"avg_urgency": 8.0, "category": "Water Supply \u0026 Sewage", "center_lat": 30.716, "center_lng": 76.749, "cluster_id": "HOTSPOT-TRICITY-008", "incident_count": 1, "sample_grievances": ["Raw sewage overflow blocking commuter pedestrian walkway at Sector 43 ISBT."], "sector": "Sector 43", "summary": "1 reported issues concerning Water Supply \u0026 Sewage in Sector 43 (Avg Urgency: 8.0/10)"}];
+    const INITIAL_SECTORS = [{"allocated_budget_lakhs": 136.0, "dominant_category": "General Public Infrastructure", "infrastructure_health_score": 20.0, "lat": 30.717, "lng": 76.792, "open_incidents": 11, "population": 34000, "sector": "Sector 20", "total_incidents": 11, "ward_number": 6, "zone": "East"}, {"allocated_budget_lakhs": 56.8, "dominant_category": "Roads \u0026 Traffic", "infrastructure_health_score": 20.0, "lat": 30.735, "lng": 76.796, "open_incidents": 10, "population": 14200, "sector": "Sector 8", "total_incidents": 10, "ward_number": 2, "zone": "East"}, {"allocated_budget_lakhs": 144.0, "dominant_category": "Roads \u0026 Traffic", "infrastructure_health_score": 56.8, "lat": 30.73, "lng": 76.774, "open_incidents": 4, "population": 36000, "sector": "Sector 22", "total_incidents": 4, "ward_number": 7, "zone": "Central"}, {"allocated_budget_lakhs": 114.0, "dominant_category": "Street Lighting \u0026 Power", "infrastructure_health_score": 82.0, "lat": 30.751, "lng": 76.762, "open_incidents": 1, "population": 28500, "sector": "Sector 15", "total_incidents": 1, "ward_number": 4, "zone": "West"}, {"allocated_budget_lakhs": 120.0, "dominant_category": "Street Lighting \u0026 Power", "infrastructure_health_score": 83.8, "lat": 30.685, "lng": 76.86, "open_incidents": 1, "population": 30000, "sector": "Sector 14 Panchkula", "total_incidents": 1, "ward_number": 203, "zone": "Panchkula"}, {"allocated_budget_lakhs": 100.0, "dominant_category": "Roads \u0026 Traffic", "infrastructure_health_score": 85.6, "lat": 30.729, "lng": 76.754, "open_incidents": 1, "population": 25000, "sector": "Sector 35", "total_incidents": 1, "ward_number": 13, "zone": "South-West"}, {"allocated_budget_lakhs": 92.0, "dominant_category": "Water Supply \u0026 Sewage", "infrastructure_health_score": 85.6, "lat": 30.716, "lng": 76.749, "open_incidents": 1, "population": 23000, "sector": "Sector 43", "total_incidents": 1, "ward_number": 16, "zone": "South"}, {"allocated_budget_lakhs": 152.0, "dominant_category": "Street Lighting \u0026 Power", "infrastructure_health_score": 85.6, "lat": 30.7055, "lng": 76.7125, "open_incidents": 1, "population": 38000, "sector": "Phase 7 Mohali", "total_incidents": 1, "ward_number": 101, "zone": "Mohali"}, {"allocated_budget_lakhs": 72.0, "dominant_category": "Sanitation \u0026 Waste Management", "infrastructure_health_score": 87.4, "lat": 30.726, "lng": 76.812, "open_incidents": 1, "population": 18000, "sector": "Sector 26", "total_incidents": 1, "ward_number": 9, "zone": "East"}, {"allocated_budget_lakhs": 56.0, "dominant_category": "Roads \u0026 Traffic", "infrastructure_health_score": 87.4, "lat": 30.722, "lng": 76.762, "open_incidents": 1, "population": 14000, "sector": "Sector 34", "total_incidents": 1, "ward_number": 12, "zone": "Central"}, {"allocated_budget_lakhs": 76.0, "dominant_category": "Water Supply \u0026 Sewage", "infrastructure_health_score": 89.2, "lat": 30.76, "lng": 76.764, "open_incidents": 1, "population": 19000, "sector": "Sector 14", "total_incidents": 1, "ward_number": 3, "zone": "West"}, {"allocated_budget_lakhs": 16.8, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.7583, "lng": 76.8058, "open_incidents": 0, "population": 4200, "sector": "Sector 1", "total_incidents": 0, "ward_number": 1, "zone": "North"}, {"allocated_budget_lakhs": 15.2, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.7547, "lng": 76.7972, "open_incidents": 0, "population": 3800, "sector": "Sector 2", "total_incidents": 0, "ward_number": 1, "zone": "North"}, {"allocated_budget_lakhs": 16.4, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.7511, "lng": 76.7886, "open_incidents": 0, "population": 4100, "sector": "Sector 3", "total_incidents": 0, "ward_number": 1, "zone": "North"}, {"allocated_budget_lakhs": 20.8, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.7475, "lng": 76.78, "open_incidents": 0, "population": 5200, "sector": "Sector 4", "total_incidents": 0, "ward_number": 1, "zone": "North"}, {"allocated_budget_lakhs": 18.4, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.759, "lng": 76.812, "open_incidents": 0, "population": 4600, "sector": "Sector 5", "total_incidents": 0, "ward_number": 1, "zone": "North"}, {"allocated_budget_lakhs": 26.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.763, "lng": 76.82, "open_incidents": 0, "population": 6500, "sector": "Sector 6", "total_incidents": 0, "ward_number": 2, "zone": "East"}, {"allocated_budget_lakhs": 50.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.732, "lng": 76.804, "open_incidents": 0, "population": 12500, "sector": "Sector 7", "total_incidents": 0, "ward_number": 2, "zone": "East"}, {"allocated_budget_lakhs": 47.2, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.742, "lng": 76.787, "open_incidents": 0, "population": 11800, "sector": "Sector 9", "total_incidents": 0, "ward_number": 2, "zone": "North"}, {"allocated_budget_lakhs": 42.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.749, "lng": 76.779, "open_incidents": 0, "population": 10500, "sector": "Sector 10", "total_incidents": 0, "ward_number": 3, "zone": "Central"}, {"allocated_budget_lakhs": 64.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.756, "lng": 76.771, "open_incidents": 0, "population": 16000, "sector": "Sector 11", "total_incidents": 0, "ward_number": 3, "zone": "Central"}, {"allocated_budget_lakhs": 34.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.764, "lng": 76.776, "open_incidents": 0, "population": 8500, "sector": "Sector 12", "total_incidents": 0, "ward_number": 3, "zone": "North"}, {"allocated_budget_lakhs": 62.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.744, "lng": 76.773, "open_incidents": 0, "population": 15500, "sector": "Sector 16", "total_incidents": 0, "ward_number": 4, "zone": "Central"}, {"allocated_budget_lakhs": 14.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.7398, "lng": 76.7827, "open_incidents": 0, "population": 3500, "sector": "Sector 17", "total_incidents": 0, "ward_number": 5, "zone": "Central"}, {"allocated_budget_lakhs": 56.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.731, "lng": 76.791, "open_incidents": 0, "population": 14000, "sector": "Sector 18", "total_incidents": 0, "ward_number": 5, "zone": "Central"}, {"allocated_budget_lakhs": 116.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.724, "lng": 76.799, "open_incidents": 0, "population": 29000, "sector": "Sector 19", "total_incidents": 0, "ward_number": 6, "zone": "East"}, {"allocated_budget_lakhs": 84.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.723, "lng": 76.783, "open_incidents": 0, "population": 21000, "sector": "Sector 21", "total_incidents": 0, "ward_number": 7, "zone": "Central"}, {"allocated_budget_lakhs": 88.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.737, "lng": 76.766, "open_incidents": 0, "population": 22000, "sector": "Sector 23", "total_incidents": 0, "ward_number": 8, "zone": "West"}, {"allocated_budget_lakhs": 100.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.743, "lng": 76.758, "open_incidents": 0, "population": 25000, "sector": "Sector 24", "total_incidents": 0, "ward_number": 8, "zone": "West"}, {"allocated_budget_lakhs": 84.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.75, "lng": 76.75, "open_incidents": 0, "population": 21000, "sector": "Sector 25", "total_incidents": 0, "ward_number": 8, "zone": "West"}, {"allocated_budget_lakhs": 88.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.719, "lng": 76.807, "open_incidents": 0, "population": 22000, "sector": "Sector 27", "total_incidents": 0, "ward_number": 9, "zone": "East"}, {"allocated_budget_lakhs": 96.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.712, "lng": 76.802, "open_incidents": 0, "population": 24000, "sector": "Sector 28", "total_incidents": 0, "ward_number": 9, "zone": "East"}, {"allocated_budget_lakhs": 104.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.705, "lng": 76.794, "open_incidents": 0, "population": 26000, "sector": "Sector 29", "total_incidents": 0, "ward_number": 10, "zone": "Industrial"}, {"allocated_budget_lakhs": 108.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.711, "lng": 76.786, "open_incidents": 0, "population": 27000, "sector": "Sector 30", "total_incidents": 0, "ward_number": 10, "zone": "Central"}, {"allocated_budget_lakhs": 106.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.7, "lng": 76.787, "open_incidents": 0, "population": 26500, "sector": "Sector 31", "total_incidents": 0, "ward_number": 11, "zone": "South"}, {"allocated_budget_lakhs": 112.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.708, "lng": 76.778, "open_incidents": 0, "population": 28000, "sector": "Sector 32", "total_incidents": 0, "ward_number": 11, "zone": "South"}, {"allocated_budget_lakhs": 76.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.715, "lng": 76.77, "open_incidents": 0, "population": 19000, "sector": "Sector 33", "total_incidents": 0, "ward_number": 12, "zone": "South"}, {"allocated_budget_lakhs": 74.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.735, "lng": 76.746, "open_incidents": 0, "population": 18500, "sector": "Sector 36", "total_incidents": 0, "ward_number": 13, "zone": "West"}, {"allocated_budget_lakhs": 124.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.742, "lng": 76.738, "open_incidents": 0, "population": 31000, "sector": "Sector 37", "total_incidents": 0, "ward_number": 14, "zone": "West"}, {"allocated_budget_lakhs": 132.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.748, "lng": 76.73, "open_incidents": 0, "population": 33000, "sector": "Sector 38", "total_incidents": 0, "ward_number": 14, "zone": "West"}, {"allocated_budget_lakhs": 128.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.73, "lng": 76.726, "open_incidents": 0, "population": 32000, "sector": "Sector 40", "total_incidents": 0, "ward_number": 15, "zone": "South-West"}, {"allocated_budget_lakhs": 116.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.736, "lng": 76.734, "open_incidents": 0, "population": 29000, "sector": "Sector 41", "total_incidents": 0, "ward_number": 15, "zone": "South-West"}, {"allocated_budget_lakhs": 84.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.724, "lng": 76.741, "open_incidents": 0, "population": 21000, "sector": "Sector 42", "total_incidents": 0, "ward_number": 16, "zone": "South"}, {"allocated_budget_lakhs": 112.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.709, "lng": 76.757, "open_incidents": 0, "population": 28000, "sector": "Sector 44", "total_incidents": 0, "ward_number": 17, "zone": "South"}, {"allocated_budget_lakhs": 168.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.702, "lng": 76.765, "open_incidents": 0, "population": 42000, "sector": "Sector 45", "total_incidents": 0, "ward_number": 17, "zone": "South"}, {"allocated_budget_lakhs": 124.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.695, "lng": 76.773, "open_incidents": 0, "population": 31000, "sector": "Sector 46", "total_incidents": 0, "ward_number": 18, "zone": "South"}, {"allocated_budget_lakhs": 108.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.688, "lng": 76.781, "open_incidents": 0, "population": 27000, "sector": "Sector 47", "total_incidents": 0, "ward_number": 18, "zone": "South"}, {"allocated_budget_lakhs": 88.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.682, "lng": 76.772, "open_incidents": 0, "population": 22000, "sector": "Sector 48", "total_incidents": 0, "ward_number": 19, "zone": "South"}, {"allocated_budget_lakhs": 96.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.688, "lng": 76.764, "open_incidents": 0, "population": 24000, "sector": "Sector 49", "total_incidents": 0, "ward_number": 19, "zone": "South"}, {"allocated_budget_lakhs": 84.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.695, "lng": 76.756, "open_incidents": 0, "population": 21000, "sector": "Sector 50", "total_incidents": 0, "ward_number": 20, "zone": "South"}, {"allocated_budget_lakhs": 76.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.702, "lng": 76.748, "open_incidents": 0, "population": 19000, "sector": "Sector 51", "total_incidents": 0, "ward_number": 20, "zone": "South"}, {"allocated_budget_lakhs": 144.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.708, "lng": 76.74, "open_incidents": 0, "population": 36000, "sector": "Sector 52", "total_incidents": 0, "ward_number": 21, "zone": "South-West"}, {"allocated_budget_lakhs": 48.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.714, "lng": 76.732, "open_incidents": 0, "population": 12000, "sector": "Sector 53", "total_incidents": 0, "ward_number": 21, "zone": "South-West"}, {"allocated_budget_lakhs": 72.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.72, "lng": 76.724, "open_incidents": 0, "population": 18000, "sector": "Sector 54", "total_incidents": 0, "ward_number": 21, "zone": "South-West"}, {"allocated_budget_lakhs": 136.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.718, "lng": 76.719, "open_incidents": 0, "population": 34000, "sector": "Phase 3B2 Mohali", "total_incidents": 0, "ward_number": 102, "zone": "Mohali"}, {"allocated_budget_lakhs": 116.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.712, "lng": 76.708, "open_incidents": 0, "population": 29000, "sector": "Phase 5 Mohali", "total_incidents": 0, "ward_number": 103, "zone": "Mohali"}, {"allocated_budget_lakhs": 124.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.696, "lng": 76.72, "open_incidents": 0, "population": 31000, "sector": "Sector 70 Mohali", "total_incidents": 0, "ward_number": 104, "zone": "Mohali"}, {"allocated_budget_lakhs": 100.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.69, "lng": 76.735, "open_incidents": 0, "population": 25000, "sector": "Sector 62 Mohali (Phase 8)", "total_incidents": 0, "ward_number": 105, "zone": "Mohali"}, {"allocated_budget_lakhs": 112.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.692, "lng": 76.852, "open_incidents": 0, "population": 28000, "sector": "Sector 5 Panchkula", "total_incidents": 0, "ward_number": 201, "zone": "Panchkula"}, {"allocated_budget_lakhs": 104.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.699, "lng": 76.845, "open_incidents": 0, "population": 26000, "sector": "Sector 7 Panchkula", "total_incidents": 0, "ward_number": 202, "zone": "Panchkula"}, {"allocated_budget_lakhs": 180.0, "dominant_category": "None Reported", "infrastructure_health_score": 100.0, "lat": 30.665, "lng": 76.855, "open_incidents": 0, "population": 45000, "sector": "Sector 20 Panchkula", "total_incidents": 0, "ward_number": 204, "zone": "Panchkula"}];
+  </script>
+  <script src="static/js/app.js"></script>
+  <!-- FLOATING TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+</body>
+</html>

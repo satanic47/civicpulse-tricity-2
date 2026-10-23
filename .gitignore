@@ -13,3 +13,5 @@ htmlcov/
 *.log
 uploads/*
 !uploads/.gitkeep
+demo_video.mp4
+*.mp3
